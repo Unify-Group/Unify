@@ -12,11 +12,18 @@ You will need to reference the GitHub Project Management guide in the course por
   - *Please be sure to share your project board with the grading team's GitHub **codepathreview**. This is separate from your repository's sharing settings.*
 - [ ] In your repo, create at least 5 issues from the features on your feature list.
   - List the title of each issue you created:
-    1.
-    2.
-    3.
-    4.
-    5.
+    1. Backend API routes for /events
+    2. Backend API routes for single event /events/:id
+    3. Create event form
+    4. Event Details
+    5. Organizer dashboard
+    6. Edit/Delete Event
+    7. RSVP System
+    8. Seach & Filter (Custom Feature)
+    9. Database
+    10. Profile
+    11. Browse Events
+    12. User Authentication (Stretch Feature)
 - [ ] In your repo, update the status of issues in your project board.
 - [ ] In your repo, create a GitHub Milestone for each final project unit, corresponding to each of the 5 milestones in your `milestones/` directory.
   - List the name of each milestone you created:
