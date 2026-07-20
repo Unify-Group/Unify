@@ -12,7 +12,7 @@ app.use(cors())
 app.use('/api/categories', categoryRoutes)
 
 app.get('/', (req, res) => {
-  res.status(200).send('<h1 style="text-align: center; margin-top: 3rem;">🤝 Unify API</h1>')
+  res.status(200).send(`<h1 style="text-align: center; margin-top: 3rem;">🤝 Unify API</h1>`)
 })
 
 app.listen(PORT, () => {
