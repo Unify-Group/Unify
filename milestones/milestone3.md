@@ -27,9 +27,11 @@ You will need to reference the GitHub Project Management guide in the course por
 - [ ] In your repo, update the status of issues in your project board.
 - [ ] In your repo, create a GitHub Milestone for each final project unit, corresponding to each of the 5 milestones in your `milestones/` directory.
   - List the name of each milestone you created:
-    1.
-    2.
-    3.
+    1. Planning & Design
+    2. Project Setup & Database
+    3. Event Discovery
+    4. Event Management
+    5. RSVP System
   - [ ] Set the completion percentage of each milestone. The GitHub Milestone for this unit (Milestone 3 - Unit 7) should be 100% completed when you submit for full points.
 - [ ] In `readme.md`, check off the features you have completed in this unit by adding a ✅ emoji in front of the feature's name.
   - [ ] Under each feature you have completed, include a GIF showing feature functionality.
