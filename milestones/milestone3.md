@@ -19,7 +19,7 @@ You will need to reference the GitHub Project Management guide in the course por
     5. Organizer dashboard
     6. Edit/Delete Event
     7. RSVP System
-    8. Seach & Filter (Custom Feature)
+    8. Search & Filter (Custom Feature)
     9. Database
     10. Profile
     11. Browse Events
