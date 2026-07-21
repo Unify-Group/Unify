@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
@@ -14,7 +13,7 @@ export const Navbar = () => {
           <Link to='#'>View Events</Link>
         </li>
         <li>
-          <Link to='#'>Create Event</Link>
+          <Link to='/events/new'>Create Event</Link>
         </li>
       </ul>
 
