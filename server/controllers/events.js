@@ -1,4 +1,4 @@
-import { pool } from '../db.js'
+import { pool } from '../config/db.js'
 
 const createEvent = async (req, res) => {
   const { category_id, title, details, event_date, duration, location, max_capacity } = req.body
