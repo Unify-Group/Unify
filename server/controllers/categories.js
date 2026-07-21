@@ -1,6 +1,6 @@
 import { pool } from '../config/db.js'
 
-export const getAllCategories = async (req, res) => {
+const getAllCategories = async (req, res) => {
   try {
     const selectQuery = 'SELECT * FROM categories'
     const result = await pool.query(selectQuery)

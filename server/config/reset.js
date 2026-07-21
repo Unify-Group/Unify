@@ -2,18 +2,18 @@ import { pool } from './db.js'
 import './dotenv.js'
 import categoryData from './data/categories.js'
 
+// STRETCH: Add auth-related columns
 const createUsersTable = async () => {
   const createTableQuery = `
         DROP TABLE IF EXISTS users CASCADE;
 
         CREATE TABLE users (
             id SERIAL PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
+            name VARCHAR(80) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
             bio TEXT,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
+        )
     `
 
   try {
@@ -32,7 +32,7 @@ const createCategoriesTable = async () => {
         CREATE TABLE categories (
             id SERIAL PRIMARY KEY,
             name VARCHAR(50) NOT NULL UNIQUE
-        );
+        )
     `
 
   try {
@@ -47,7 +47,7 @@ const createCategoriesTable = async () => {
 const seedCategoriesTable = async () => {
   const insertQuery = `
         INSERT INTO categories (name)
-        VALUES ($1);
+        VALUES ($1)
     `
 
   try {
@@ -59,21 +59,22 @@ const seedCategoriesTable = async () => {
   }
 }
 
+// TODO: Add "organizer_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE" to column under id after users table is completed
+// STRETCH: Implement location data
 const createEventsTable = async () => {
   const createTableQuery = `
         DROP TABLE IF EXISTS events CASCADE;
 
         CREATE TABLE events (
             id SERIAL PRIMARY KEY,
-            host_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-            category_id INT REFERENCES categories(id) ON DELETE SET NULL,
-            title VARCHAR(150) NOT NULL,
-            details TEXT,
-            event_date TIMESTAMPTZ NOT NULL,
+            title VARCHAR(80) NOT NULL,
+            datetime TIMESTAMPTZ NOT NULL,
             location VARCHAR(255) NOT NULL,
-            max_capacity INT CHECK (max_capacity > 0),
+            description TEXT,
+            attendee_limit INT CHECK (attendee_limit > 0),
+            category_id INT REFERENCES categories(id) ON DELETE SET NULL,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-        );
+        )
     `
   try {
     await pool.query(createTableQuery)
@@ -94,7 +95,7 @@ const createRsvpsTable = async () => {
             status VARCHAR(20) NOT NULL DEFAULT 'attending' CHECK (status IN('attending', 'waitlisted')),
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             PRIMARY KEY (user_id, event_id)
-        );
+        )
     `
   try {
     await pool.query(createTableQuery)
