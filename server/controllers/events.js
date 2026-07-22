@@ -1,12 +1,13 @@
 import { pool } from '../config/db.js'
 
 const createEvent = async (req, res) => {
-  const { title, description, datetime, location, attendee_limit, category_id } = req.body
+  const { title, description, datetime, location, attendee_limit, category_id, organizer_id } =
+    req.body
 
   try {
     const insertQuery = `
-      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id, organizer_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `
     const result = await pool.query(insertQuery, [
@@ -16,6 +17,7 @@ const createEvent = async (req, res) => {
       location,
       attendee_limit,
       category_id,
+      organizer_id,
     ])
     res.status(201).json(result.rows[0])
     console.log('🆕 event created successfully:', result.rows[0])
@@ -27,7 +29,7 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    const selectQuery = 'SELECT * FROM events ORDER BY event_date ASC'
+    const selectQuery = 'SELECT * FROM events ORDER BY datetime ASC'
     const result = await pool.query(selectQuery)
     res.status(200).json(result.rows)
   } catch (err) {
