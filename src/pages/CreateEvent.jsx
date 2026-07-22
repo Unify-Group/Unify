@@ -1,6 +1,24 @@
+import { createEvent } from '../services/EventAPI'
+
 export const CreateEvent = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+
+    const eventData = {
+      title: formData.get('title'),
+      description: formData.get('description'),
+      datetime: formData.get('datetime'),
+      location: formData.get('location'),
+      attendee_limit: formData.get('attendee_limit') || null,
+      category_id: formData.get('category') || null,
+    }
+
+    createEvent(eventData)
+  }
+
   return (
-    <form className='event-form'>
+    <form className='event-form' onSubmit={handleSubmit}>
       <h2>Create New Event</h2>
       <fieldset>
         <div className='grid'>

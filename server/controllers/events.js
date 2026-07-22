@@ -27,7 +27,7 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    const selectQuery = 'SELECT * FROM events ORDER BY event_date ASC'
+    const selectQuery = 'SELECT * FROM events ORDER BY datetime ASC'
     const result = await pool.query(selectQuery)
     res.status(200).json(result.rows)
   } catch (err) {
@@ -52,6 +52,7 @@ const getEventById = async (req, res) => {
 }
 
 export default {
+  createEvent,
   getAllEvents,
   getEventById,
 }
