@@ -2,31 +2,30 @@ import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
   return (
-    <nav>
-      <ul>
+    <nav className='navbar'>
+      <Link to='/' className='brand'>
+        <span className='brand-mark' aria-hidden='true'>
+          <span className='dot dot-left'></span>
+          <span className='dot dot-right'></span>
+        </span>
+        <span className='brand-text'>Unify</span>
+      </Link>
+
+      <ul className='nav-links'>
         <li>
-          <Link to='/'>
-            <h1>Unify</h1>
-          </Link>
+          <Link to='/'>Home</Link>
         </li>
         <li>
-          <Link to='#'>View Events</Link>
+          <a href='#featured-events'>Events</a>
         </li>
         <li>
-          <Link to='/events/new'>Create Event</Link>
+          <a href='#about'>About</a>
         </li>
       </ul>
 
-      <ul>
-        <li>
-          <Link to='#'>Log in</Link>
-        </li>
-        <li>
-          <Link to='#' role='button'>
-            Sign up
-          </Link>
-        </li>
-      </ul>
+      <Link to='/signup' className='create-event-btn'>
+        + Create Event
+      </Link>
     </nav>
   )
 }

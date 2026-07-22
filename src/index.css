@@ -1,4 +1,28 @@
-nav h1 {
-  margin-bottom: 0;
-  margin-right: 1rem;
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --primary-tint: #eef2ff;
+  --accent: #fb923c;
+  --success: #16a34a;
+  --ink: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg-subtle: #f9fafb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--ink);
+  background: var(--bg-subtle);
 }
