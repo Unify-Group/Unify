@@ -26,17 +26,12 @@ export const Navbar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink
-            to='/profile'
-            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-          >
-            Profile
-          </NavLink>
+          <Link to='/events/create' className='create-event-btn'>Create Event</Link>
         </li>
       </ul>
 
-      <Link to='/signup' className='create-event-btn'>
-        + Create Event
+      <Link to='/signup'>
+        Sign Up
       </Link>
     </nav>
   )

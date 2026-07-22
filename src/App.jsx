@@ -35,7 +35,7 @@ function App() {
       element: <Home />,
     },
     {
-      path: '/events/new',
+      path: '/events/create',
       element: <CreateEvent />,
     },
     {

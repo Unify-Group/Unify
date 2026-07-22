@@ -149,7 +149,7 @@ const createEventsTable = async () => {
             title VARCHAR(80) NOT NULL,
             datetime TIMESTAMPTZ NOT NULL,
             location VARCHAR(255) NOT NULL,
-            description TEXT,
+            description TEXT NOT NULL,
             attendee_limit INT CHECK (attendee_limit > 0),
             organizer_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             category_id INT REFERENCES categories(id) ON DELETE SET NULL,

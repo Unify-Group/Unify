@@ -654,3 +654,22 @@
     font-size: 1.65rem;
   }
 }
+
+form .grid {
+  gap: 0 2.5rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: var(--pico-block-spacing-horizontal);
+}
+
+.form-buttons > button {
+  width: inherit;
+}
+
+fieldset {
+  padding: 2.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--pico-secondary-border);
+}
