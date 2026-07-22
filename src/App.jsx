@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useLocation, useRoutes } from 'react-router-dom'
 import './App.css'
 import { Navbar } from './components/Navbar'
@@ -5,9 +6,25 @@ import { CreateEvent } from './pages/CreateEvent'
 import { Home } from './pages/Home'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
+import { clearSession, refreshCurrentUser } from './utils/authClient'
 
 function App() {
   const location = useLocation()
+  const [isAuthReady, setIsAuthReady] = useState(false)
+
+  useEffect(() => {
+    const bootstrapSession = async () => {
+      try {
+        await refreshCurrentUser()
+      } catch {
+        clearSession()
+      } finally {
+        setIsAuthReady(true)
+      }
+    }
+
+    bootstrapSession()
+  }, [])
 
   const routes = useRoutes([
     {
@@ -30,6 +47,7 @@ function App() {
 
   return (
     <div className='app'>
+      {!isAuthReady && <div className='auth-bootstrap'>Loading session...</div>}
       {location.pathname === '/' && (
         <header className='site-header'>
           <Navbar />

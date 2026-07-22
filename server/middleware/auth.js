@@ -1,19 +1,26 @@
 import { verifyToken } from '../utils/jwt.js'
 
-export const requireAuth = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    return res.status(401).json({
+      message: 'Authentication required',
+    })
   }
 
-  const token = authHeader.slice(7)
+  const token = authHeader.split(' ')[1]
 
   try {
-    const payload = verifyToken(token)
-    req.user = payload
-    return next()
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' })
+    const decoded = verifyToken(token)
+    req.user = decoded
+
+    next()
+  } catch {
+    return res.status(401).json({
+      message: 'Invalid or expired token',
+    })
   }
 }
+
+export const requireAuth = authenticate

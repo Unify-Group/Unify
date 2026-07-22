@@ -6,7 +6,9 @@ const toJsonOrThrow = async (response) => {
   const payload = await response.json().catch(() => ({}))
 
   if (!response.ok) {
-    throw new Error(payload.error || 'Request failed')
+    const message =
+      payload?.error?.message || payload?.message || payload?.error || 'Request failed'
+    throw new Error(message)
   }
 
   return payload
@@ -40,6 +42,18 @@ export const fetchCurrentUser = async (token) => {
   })
 
   return toJsonOrThrow(response)
+}
+
+export const refreshCurrentUser = async () => {
+  const token = getSavedToken()
+
+  if (!token) {
+    return null
+  }
+
+  const payload = await fetchCurrentUser(token)
+  saveSession({ token, user: payload.user })
+  return payload.user
 }
 
 export const saveSession = ({ token, user }) => {

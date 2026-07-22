@@ -101,6 +101,15 @@
   width: 100%;
 }
 
+.auth-bootstrap {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+  color: #111111;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .hero {
   max-width: 1200px;
   margin: 0 auto;

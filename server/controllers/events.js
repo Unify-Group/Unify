@@ -1,8 +1,12 @@
 import { pool } from '../config/db.js'
 
 const createEvent = async (req, res) => {
-  const { title, description, datetime, location, attendee_limit, category_id, organizer_id } =
-    req.body
+  const { title, description, datetime, location, attendee_limit, category_id } = req.body
+  const organizer_id = req.user?.id
+
+  if (!organizer_id) {
+    return res.status(401).json({ message: 'Authentication required' })
+  }
 
   try {
     const insertQuery = `
@@ -54,6 +58,7 @@ const getEventById = async (req, res) => {
 }
 
 export default {
+  createEvent,
   getAllEvents,
   getEventById,
 }
