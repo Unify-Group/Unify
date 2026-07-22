@@ -5,6 +5,7 @@ import { login, saveSession } from '../utils/authClient'
 export const SignIn = () => {
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -21,7 +22,7 @@ export const SignIn = () => {
     try {
       const payload = await login({ email: form.email, password: form.password })
       saveSession(payload)
-      navigate('/')
+      navigate('/events')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -78,15 +79,25 @@ export const SignIn = () => {
           />
 
           <label htmlFor='password'>Password</label>
-          <input
-            id='password'
-            name='password'
-            type='password'
-            value={form.password}
-            onChange={onChange}
-            placeholder='Enter your password'
-            required
-          />
+          <div className='password-field'>
+            <input
+              id='password'
+              name='password'
+              type={showPassword ? 'text' : 'password'}
+              value={form.password}
+              onChange={onChange}
+              placeholder='Enter your password'
+              required
+            />
+            <button
+              type='button'
+              className='password-toggle'
+              onClick={() => setShowPassword((current) => !current)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
 
           {error && <p className='auth-error'>{error}</p>}
 

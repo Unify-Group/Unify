@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 export const Navbar = () => {
   return (
@@ -13,13 +13,25 @@ export const Navbar = () => {
 
       <ul className='nav-links'>
         <li>
-          <Link to='/'>Home</Link>
+          <NavLink to='/' className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            Home
+          </NavLink>
         </li>
         <li>
-          <a href='#featured-events'>Events</a>
+          <NavLink
+            to='/events'
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            Events
+          </NavLink>
         </li>
         <li>
-          <a href='#about'>About</a>
+          <NavLink
+            to='/profile'
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            Profile
+          </NavLink>
         </li>
       </ul>
 

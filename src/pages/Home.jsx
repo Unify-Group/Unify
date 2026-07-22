@@ -40,9 +40,9 @@ export const Home = () => {
             you.
           </p>
           <div className='hero-actions'>
-            <a href='#featured-events' className='btn btn-primary'>
+            <Link to='/events' className='btn btn-primary'>
               Browse Events
-            </a>
+            </Link>
             <Link to='/signup' className='btn btn-secondary'>
               Host an Event
             </Link>
