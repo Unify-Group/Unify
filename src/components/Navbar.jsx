@@ -13,7 +13,7 @@ export const Navbar = () => {
           <Link to='#'>View Events</Link>
         </li>
         <li>
-          <Link to='/events/new'>Create Event</Link>
+          <Link to='/events/create'>Create Event</Link>
         </li>
       </ul>
 

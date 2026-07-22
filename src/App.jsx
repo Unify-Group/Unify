@@ -7,7 +7,7 @@ import { CreateEvent } from './pages/CreateEvent'
 function App() {
   const routes = useRoutes([
     {
-      path: '/events/new',
+      path: '/events/create',
       element: <CreateEvent />,
     },
   ])
