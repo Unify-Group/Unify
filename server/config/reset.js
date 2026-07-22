@@ -4,17 +4,26 @@ import categoryData from './data/categories.js'
 import userData from './data/users.js'
 import eventData from './data/events.js'
 import rsvpData from './data/rsvps.js'
+import profileData from './data/profiles.js'
 
-// STRETCH: Add auth-related columns
 const createUsersTable = async () => {
   const createTableQuery = `
         DROP TABLE IF EXISTS users CASCADE;
 
         CREATE TABLE users (
             id SERIAL PRIMARY KEY,
-            name VARCHAR(80) NOT NULL,
+            first_name VARCHAR(80) NOT NULL,
+            last_name VARCHAR(80) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
-            bio TEXT,
+            password_hash TEXT,
+            provider VARCHAR(20) NOT NULL DEFAULT 'local' CHECK (provider IN ('local', 'google', 'github')),
+            provider_id VARCHAR(255),
+            avatar_url TEXT,
+            CONSTRAINT users_provider_identity_unique UNIQUE (provider, provider_id),
+            CONSTRAINT users_auth_shape CHECK (
+              (provider = 'local' AND provider_id IS NULL AND password_hash IS NOT NULL)
+              OR (provider IN ('google', 'github') AND provider_id IS NOT NULL)
+            ),
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
     `
@@ -24,6 +33,28 @@ const createUsersTable = async () => {
     console.log('✅ users table created successfully')
   } catch (err) {
     console.error('❌ error creating users table:', err)
+    throw err
+  }
+}
+
+const createProfilesTable = async () => {
+  const createTableQuery = `
+        DROP TABLE IF EXISTS profiles CASCADE;
+
+        CREATE TABLE profiles (
+            id SERIAL PRIMARY KEY,
+            user_id INT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            bio TEXT,
+            interests TEXT,
+            avatar_url TEXT
+        )
+    `
+
+  try {
+    await pool.query(createTableQuery)
+    console.log('✅ profiles table created successfully')
+  } catch (err) {
+    console.error('❌ error creating profiles table:', err)
     throw err
   }
 }
@@ -64,17 +95,46 @@ const seedCategoriesTable = async () => {
 
 const seedUsersTable = async () => {
   const insertQuery = `
-        INSERT INTO users (name, email, bio)
-        VALUES ($1, $2, $3)
+        INSERT INTO users (first_name, last_name, email, password_hash, provider, provider_id, avatar_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
     `
 
   try {
     await Promise.all(
-      userData.map((user) => pool.query(insertQuery, [user.name, user.email, user.bio]))
+      userData.map((user) =>
+        pool.query(insertQuery, [
+          user.first_name,
+          user.last_name,
+          user.email,
+          user.password_hash,
+          user.provider,
+          user.provider_id,
+          user.avatar_url,
+        ])
+      )
     )
     console.log('✅ users seeded successfully')
   } catch (err) {
     console.error('⚠️ error inserting users:', err)
+    throw err
+  }
+}
+
+const seedProfilesTable = async () => {
+  const insertQuery = `
+        INSERT INTO profiles (user_id, bio, interests, avatar_url)
+        VALUES ($1, $2, $3, $4)
+    `
+
+  try {
+    await Promise.all(
+      profileData.map((profile) =>
+        pool.query(insertQuery, [profile.user_id, profile.bio, profile.interests, profile.avatar_url])
+      )
+    )
+    console.log('✅ profiles seeded successfully')
+  } catch (err) {
+    console.error('⚠️ error inserting profiles:', err)
     throw err
   }
 }
@@ -173,10 +233,12 @@ const seedRsvpsTable = async () => {
 const resetDb = async () => {
   try {
     await createUsersTable()
+    await createProfilesTable()
     await createCategoriesTable()
     await createEventsTable()
     await createRsvpsTable()
     await seedUsersTable()
+    await seedProfilesTable()
     await seedCategoriesTable()
     await seedEventsTable()
     await seedRsvpsTable()
