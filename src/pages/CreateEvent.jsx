@@ -1,6 +1,18 @@
-import { createEvent } from '../services/EventAPI'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 export const CreateEvent = () => {
+  export const createEvent = async (eventData) => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
+    }
+
+    await fetch(`${API_BASE_URL}/api/events`, options)
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
