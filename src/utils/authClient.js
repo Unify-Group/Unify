@@ -1,47 +1,53 @@
+import axios from 'axios'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 const TOKEN_KEY = 'unify_token'
 const USER_KEY = 'unify_user'
 
-const toJsonOrThrow = async (response) => {
-  const payload = await response.json().catch(() => ({}))
+const client = axios.create({
+  baseURL: API_BASE_URL,
+})
 
-  if (!response.ok) {
+const toJsonOrThrow = async (promise) => {
+  try {
+    const response = await promise
+    return response.data
+  } catch (error) {
+    const payload = error?.response?.data || {}
     const message =
-      payload?.error?.message || payload?.message || payload?.error || 'Request failed'
+      payload?.error?.message || payload?.message || payload?.error || error?.message || 'Request failed'
     throw new Error(message)
   }
-
-  return payload
 }
 
 export const signup = async ({ first_name, last_name, email, password }) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ first_name, last_name, email, password }),
-  })
-
-  return toJsonOrThrow(response)
+  return toJsonOrThrow(
+    client.post('/api/auth/signup', {
+      first_name,
+      last_name,
+      email,
+      password,
+    })
+  )
 }
 
 export const login = async ({ email, password }) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-
-  return toJsonOrThrow(response)
+  return toJsonOrThrow(
+    client.post('/api/auth/login', {
+      email,
+      password,
+    })
+  )
 }
 
 export const fetchCurrentUser = async (token) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  return toJsonOrThrow(response)
+  return toJsonOrThrow(
+    client.get('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  )
 }
 
 export const refreshCurrentUser = async () => {

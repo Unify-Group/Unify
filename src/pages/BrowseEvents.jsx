@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect, useMemo, useState } from 'react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
@@ -26,16 +27,10 @@ export const BrowseEvents = () => {
     const loadEvents = async () => {
       try {
         setError('')
-        const response = await fetch(`${API_BASE_URL}/api/events`)
-        const payload = await response.json()
-
-        if (!response.ok) {
-          throw new Error(payload?.error || 'Failed to load events')
-        }
-
-        setEvents(payload)
+        const response = await axios.get(`${API_BASE_URL}/api/events`)
+        setEvents(response.data)
       } catch (err) {
-        setError(err.message)
+        setError(err?.response?.data?.message || err.message || 'Failed to load events')
       } finally {
         setLoading(false)
       }

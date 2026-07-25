@@ -1,16 +1,10 @@
+import axios from 'axios'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 export const CreateEvent = () => {
   const createEvent = async (eventData) => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(eventData),
-    }
-
-    await fetch(`${API_BASE_URL}/api/events`, options)
+    await axios.post(`${API_BASE_URL}/api/events`, eventData)
   }
 
   const handleSubmit = (event) => {

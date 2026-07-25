@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
@@ -35,20 +36,15 @@ export const Home = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/categories`)
-        if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`)
-        } else {
-          const data = await response.json()
-          setCategories(data)
-        }
+        const response = await axios.get(`${API_BASE_URL}/api/categories`)
+        setCategories(response.data)
       } catch (error) {
         console.error(error)
       }
     }
 
     fetchCategories()
-  })
+  }, [])
   return (
     <>
       <section className='hero'>
