@@ -497,13 +497,13 @@
   font-weight: 600;
 }
 
-.auth-form {
+form {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
 }
 
-.auth-form label {
+form label {
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-top: 0.35rem;
@@ -512,7 +512,9 @@
   font-weight: 700;
 }
 
-.auth-form input {
+form input,
+form select,
+form textarea {
   width: 100%;
   min-height: 46px;
   border: 1px solid var(--border);
@@ -521,6 +523,7 @@
   padding: 0.75rem 0.9rem;
   font-size: 0.95rem;
   color: #111111;
+  font-family: inherit;
 }
 
 .password-field {
@@ -545,7 +548,9 @@
   padding: 0.2rem 0.25rem;
 }
 
-.auth-form input::placeholder {
+form input::placeholder,
+form select::placeholder,
+form textarea::placeholder {
   color: #111111;
   opacity: 1;
 }
@@ -595,6 +600,34 @@
   color: var(--primary);
   text-decoration: none;
   font-weight: 600;
+}
+
+.event-form {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.event-form fieldset {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: #fff;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+button,
+.btn {
+  cursor: pointer;
 }
 
 @media (max-width: 920px) {
