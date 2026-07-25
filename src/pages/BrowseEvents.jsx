@@ -1,4 +1,4 @@
-import { fetchEvents } from '../utils/apiHelpers.js'
+import { getEvents } from '../utils/apiHelpers.js'
 import { useEffect, useMemo, useState } from 'react'
 
 const formatDate = (dateValue) => {
@@ -25,7 +25,7 @@ export const BrowseEvents = () => {
     const loadEvents = async () => {
       try {
         setError('')
-        const events = await fetchEvents()
+        const events = await getEvents()
         setEvents(events)
       } catch (err) {
         setError(err.message)

@@ -1,17 +1,46 @@
-import { createEvent } from '../utils/apiHelpers.js'
+import { createEvent, getCategories } from '../utils/apiHelpers.js'
+import { useState, useEffect } from 'react'
 
 export const CreateEvent = () => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    datetime: '',
+    location: '',
+    attendee_limit: '',
+    category: '',
+  })
+
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categories = await getCategories()
+        setCategories(categories)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    loadCategories()
+  }, [])
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const formData = new FormData(event.target)
 
     const eventData = {
-      title: formData.get('title'),
-      description: formData.get('description'),
-      datetime: formData.get('datetime'),
-      location: formData.get('location'),
-      attendee_limit: formData.get('attendee_limit') || null,
-      category_id: formData.get('category') || null,
+      title: formData.title,
+      description: formData.description,
+      datetime: formData.datetime,
+      location: formData.location,
+      attendee_limit: formData.attendee_limit ? Number(formData.attendee_limit) : null,
+      category_id: formData.category || null,
     }
 
     await createEvent(eventData)
@@ -26,14 +55,27 @@ export const CreateEvent = () => {
           type='text'
           id='title'
           name='title'
+          value={formData.title}
+          onChange={handleChange}
           maxLength={80}
           placeholder='Enter event title'
           required
         />
 
         <label htmlFor='category'>Category (optional)</label>
-        <select name='category' id='category' defaultValue=''>
+        <select
+          name='category'
+          id='category'
+          value={formData.category}
+          onChange={handleChange}
+          defaultValue=''
+        >
           <option value=''>Select a category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
         </select>
 
         <label htmlFor='attendee_limit'>Capacity (optional)</label>
@@ -41,18 +83,29 @@ export const CreateEvent = () => {
           type='number'
           id='attendee_limit'
           name='attendee_limit'
+          value={formData.attendee_limit}
+          onChange={handleChange}
           min={1}
           placeholder='Enter capacity'
         />
 
         <label htmlFor='datetime'>Date & Time</label>
-        <input type='datetime-local' id='datetime' name='datetime' required />
+        <input
+          type='datetime-local'
+          id='datetime'
+          name='datetime'
+          value={formData.datetime}
+          onChange={handleChange}
+          required
+        />
 
         <label htmlFor='location'>Location</label>
         <input
           type='text'
           id='location'
           name='location'
+          value={formData.location}
+          onChange={handleChange}
           maxLength={255}
           placeholder='Enter location'
           required
@@ -62,6 +115,8 @@ export const CreateEvent = () => {
         <textarea
           id='description'
           name='description'
+          value={formData.description}
+          onChange={handleChange}
           rows={4}
           placeholder='Tell people about your event...'
           required

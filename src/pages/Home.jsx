@@ -1,4 +1,4 @@
-import { fetchCategories } from '../utils/apiHelpers.js'
+import { getCategories } from '../utils/apiHelpers.js'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
@@ -34,10 +34,10 @@ export const Home = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categories = await fetchCategories()
+        const categories = await getCategories()
         setCategories(categories)
       } catch (error) {
-        console.error(error)
+        setCategories([])
       }
     }
 
