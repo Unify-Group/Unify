@@ -1,8 +1,6 @@
-import axios from 'axios'
+import { fetchCategories } from '../utils/apiHelpers.js'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 const featuredEvents = [
   {
@@ -34,16 +32,16 @@ const featuredEvents = [
 export const Home = () => {
   const [categories, setCategories] = useState([])
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/categories`)
-        setCategories(response.data)
+        const categories = await fetchCategories()
+        setCategories(categories)
       } catch (error) {
         console.error(error)
       }
     }
 
-    fetchCategories()
+    loadCategories()
   }, [])
   return (
     <>

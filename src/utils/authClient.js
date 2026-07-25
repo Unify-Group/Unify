@@ -1,52 +1,44 @@
-import axios from 'axios'
+import { apiClient, extractErrorMessage } from './apiClient.js'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 const TOKEN_KEY = 'unify_token'
 const USER_KEY = 'unify_user'
-
-const client = axios.create({
-  baseURL: API_BASE_URL,
-})
 
 const toJsonOrThrow = async (promise) => {
   try {
     const response = await promise
     return response.data
   } catch (error) {
-    const payload = error?.response?.data || {}
-    const message =
-      payload?.error?.message || payload?.message || payload?.error || error?.message || 'Request failed'
-    throw new Error(message)
+    throw new Error(extractErrorMessage(error))
   }
 }
 
 export const signup = async ({ first_name, last_name, email, password }) => {
   return toJsonOrThrow(
-    client.post('/api/auth/signup', {
+    apiClient.post('/api/auth/signup', {
       first_name,
       last_name,
       email,
       password,
-    })
+    }),
   )
 }
 
 export const login = async ({ email, password }) => {
   return toJsonOrThrow(
-    client.post('/api/auth/login', {
+    apiClient.post('/api/auth/login', {
       email,
       password,
-    })
+    }),
   )
 }
 
 export const fetchCurrentUser = async (token) => {
   return toJsonOrThrow(
-    client.get('/api/auth/me', {
+    apiClient.get('/api/auth/me', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    })
+    }),
   )
 }
 

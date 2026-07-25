@@ -1,13 +1,7 @@
-import axios from 'axios'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+import { createEvent } from '../utils/apiHelpers.js'
 
 export const CreateEvent = () => {
-  const createEvent = async (eventData) => {
-    await axios.post(`${API_BASE_URL}/api/events`, eventData)
-  }
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
 
@@ -20,7 +14,7 @@ export const CreateEvent = () => {
       category_id: formData.get('category') || null,
     }
 
-    createEvent(eventData)
+    await createEvent(eventData)
   }
 
   return (

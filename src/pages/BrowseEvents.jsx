@@ -1,7 +1,5 @@
-import axios from 'axios'
+import { fetchEvents } from '../utils/apiHelpers.js'
 import { useEffect, useMemo, useState } from 'react'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 const formatDate = (dateValue) => {
   try {
@@ -27,10 +25,10 @@ export const BrowseEvents = () => {
     const loadEvents = async () => {
       try {
         setError('')
-        const response = await axios.get(`${API_BASE_URL}/api/events`)
-        setEvents(response.data)
+        const events = await fetchEvents()
+        setEvents(events)
       } catch (err) {
-        setError(err?.response?.data?.message || err.message || 'Failed to load events')
+        setError(err.message)
       } finally {
         setLoading(false)
       }
