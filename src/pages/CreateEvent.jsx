@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
 
 export const CreateEvent = () => {
-  export const createEvent = async (eventData) => {
+  const createEvent = async (eventData) => {
     const options = {
       method: 'POST',
       headers: {
@@ -31,42 +31,34 @@ export const CreateEvent = () => {
 
   return (
     <form className='event-form' onSubmit={handleSubmit}>
-      <h2>Create New Event</h2>
+      <h1>Create New Event</h1>
       <fieldset>
-        <div className='grid'>
-          <div>
-            <label htmlFor='title'>Event Title</label>
-            <input
-              type='text'
-              id='title'
-              name='title'
-              maxLength={80}
-              placeholder='Enter event title'
-              required
-            />
+        <label htmlFor='title'>Event Title</label>
+        <input
+          type='text'
+          id='title'
+          name='title'
+          maxLength={80}
+          placeholder='Enter event title'
+          required
+        />
 
-            <label htmlFor='category'>Category (optional)</label>
-            <select name='category' id='category' defaultValue=''>
-              <option disabled value=''>
-                Select a category
-              </option>
-            </select>
-          </div>
+        <label htmlFor='category'>Category (optional)</label>
+        <select name='category' id='category' defaultValue=''>
+          <option value=''>Select a category</option>
+        </select>
 
-          <div>
-            <label htmlFor='datetime'>Date & Time</label>
-            <input type='datetime-local' id='datetime' name='datetime' required />
+        <label htmlFor='attendee_limit'>Capacity (optional)</label>
+        <input
+          type='number'
+          id='attendee_limit'
+          name='attendee_limit'
+          min={1}
+          placeholder='Enter capacity'
+        />
 
-            <label htmlFor='attendee_limit'>Capacity (optional)</label>
-            <input
-              type='number'
-              id='attendee_limit'
-              name='attendee_limit'
-              min={1}
-              placeholder='Enter capacity'
-            />
-          </div>
-        </div>
+        <label htmlFor='datetime'>Date & Time</label>
+        <input type='datetime-local' id='datetime' name='datetime' required />
 
         <label htmlFor='location'>Location</label>
         <input
@@ -89,8 +81,10 @@ export const CreateEvent = () => {
       </fieldset>
 
       <div className='form-buttons'>
-        <button type='submit'>Create Event</button>
-        <button type='button' className='secondary' onClick={() => window.history.back()}>
+        <button type='submit' className='btn btn-primary'>
+          Create Event
+        </button>
+        <button type='button' className='btn btn-secondary' onClick={() => window.history.back()}>
           Cancel
         </button>
       </div>
