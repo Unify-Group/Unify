@@ -1,36 +1,25 @@
-import { getCategories } from '../utils/apiHelpers.js'
+import { getCategories, getEvents } from '../utils/apiHelpers.js'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
-const featuredEvents = [
-  {
-    id: 1,
-    title: 'Tech Mixer',
-    date: 'May 20 · 6:00 PM',
-    location: 'Houston, TX',
-    going: 42,
-    tone: 'indigo',
-  },
-  {
-    id: 2,
-    title: 'Yoga in the Park',
-    date: 'May 22 · 9:00 AM',
-    location: 'Memorial Park',
-    going: 16,
-    tone: 'orange',
-  },
-  {
-    id: 3,
-    title: 'Game Night',
-    date: 'May 24 · 7:00 PM',
-    location: 'Midtown',
-    going: 28,
-    tone: 'indigo',
-  },
-]
+const formatDate = (dateValue) => {
+  try {
+    return new Date(dateValue).toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  } catch {
+    return dateValue
+  }
+}
 
 export const Home = () => {
   const [categories, setCategories] = useState([])
+  const [upcomingEvents, setUpcomingEvents] = useState([])
+
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -42,6 +31,19 @@ export const Home = () => {
     }
 
     loadCategories()
+  }, [])
+
+  useEffect(() => {
+    const loadUpcomingEvents = async () => {
+      try {
+        const events = await getEvents()
+        setUpcomingEvents(events.slice(0, 3))
+      } catch (error) {
+        setUpcomingEvents([])
+      }
+    }
+
+    loadUpcomingEvents()
   }, [])
   return (
     <>
@@ -62,20 +64,20 @@ export const Home = () => {
         <div className='hero-art' aria-hidden='true'></div>
       </section>
 
-      <section id='featured-events' className='section'>
+      <section id='upcoming-events' className='section'>
         <div className='section-header'>
-          <h2>Featured Events</h2>
-          <a href='#'>View all</a>
+          <h2>Upcoming Events</h2>
+          <Link to='/events'>View all</Link>
         </div>
 
         <div className='event-grid'>
-          {featuredEvents.map((event) => (
+          {upcomingEvents.map((event) => (
             <article key={event.id} className='event-card'>
-              <div className={`event-image ${event.tone}`}></div>
+              <div className='event-image indigo'></div>
               <h3>{event.title}</h3>
-              <p>{event.date}</p>
+              <p>{formatDate(event.datetime)}</p>
               <p>{event.location}</p>
-              <span>{event.going} Going</span>
+              <span>{event.attendee_limit ? `${event.attendee_limit} seats` : 'Open invite'}</span>
             </article>
           ))}
         </div>
