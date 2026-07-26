@@ -1,7 +1,7 @@
 const categories = [
   { name: 'Career' },
   { name: 'Sports & Fitness' },
-  { name: 'Studying' },
+  { name: 'School' },
   { name: 'Social' },
   { name: 'Hobbies' },
   { name: 'Food & Drink' },
