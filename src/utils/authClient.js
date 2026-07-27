@@ -65,3 +65,17 @@ export const clearSession = () => {
 }
 
 export const getSavedToken = () => localStorage.getItem(TOKEN_KEY)
+
+export const getSavedUser = () => {
+  const rawUser = localStorage.getItem(USER_KEY)
+
+  if (!rawUser) {
+    return null
+  }
+
+  try {
+    return JSON.parse(rawUser)
+  } catch {
+    return null
+  }
+}

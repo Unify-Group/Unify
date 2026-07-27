@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useRoutes } from 'react-router-dom'
+import { Navigate, useLocation, useRoutes } from 'react-router-dom'
 import './App.css'
 import { Navbar } from './components/Navbar'
 import { BrowseEvents } from './pages/BrowseEvents'
 import { CreateEvent } from './pages/CreateEvent'
 import { Home } from './pages/Home'
+import { HomeDashboard } from './pages/HomeDashboard'
 import { Profile } from './pages/Profile'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
-import { clearSession, refreshCurrentUser } from './utils/authClient'
+import { clearSession, getSavedToken, refreshCurrentUser } from './utils/authClient'
 
 function App() {
   const location = useLocation()
   const [isAuthReady, setIsAuthReady] = useState(false)
+  const isAuthenticated = Boolean(getSavedToken())
   const hideHeader = location.pathname === '/login' || location.pathname === '/signup'
 
   useEffect(() => {
@@ -32,39 +34,47 @@ function App() {
   const routes = useRoutes([
     {
       path: '/',
-      element: <Home />,
+      element: <Home isAuthenticated={isAuthenticated} />,
+    },
+    {
+      path: '/home',
+      element: isAuthenticated ? <HomeDashboard /> : <Navigate to='/login' replace />,
     },
     {
       path: '/events/create',
-      element: <CreateEvent />,
+      element: isAuthenticated ? <CreateEvent /> : <Navigate to='/login' replace />,
     },
     {
       path: '/events',
-      element: <BrowseEvents />,
+      element: isAuthenticated ? <BrowseEvents /> : <Navigate to='/login' replace />,
     },
     {
       path: '/profile',
-      element: <Profile />,
+      element: isAuthenticated ? <Profile /> : <Navigate to='/login' replace />,
     },
     {
       path: '/signup',
-      element: <SignUp />,
+      element: isAuthenticated ? <Navigate to='/home' replace /> : <SignUp />,
     },
     {
       path: '/login',
-      element: <SignIn />,
+      element: isAuthenticated ? <Navigate to='/home' replace /> : <SignIn />,
+    },
+    {
+      path: '*',
+      element: <Navigate to={isAuthenticated ? '/home' : '/'} replace />,
     },
   ])
 
   return (
     <div className='app'>
       {!isAuthReady && <div className='auth-bootstrap'>Loading session...</div>}
-      {!hideHeader && (
+      {isAuthReady && !hideHeader && (
         <header className='site-header'>
-          <Navbar />
+          <Navbar isAuthenticated={isAuthenticated} />
         </header>
       )}
-      <main className='site-main'>{routes}</main>
+      {isAuthReady && <main className='site-main'>{routes}</main>}
     </div>
   )
 }

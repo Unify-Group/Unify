@@ -22,7 +22,7 @@ export const SignIn = () => {
     try {
       const payload = await login({ email: form.email, password: form.password })
       saveSession(payload)
-      navigate('/events')
+      navigate('/home')
     } catch (err) {
       setError(err.message)
     } finally {

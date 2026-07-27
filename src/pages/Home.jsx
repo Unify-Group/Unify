@@ -16,9 +16,11 @@ const formatDate = (dateValue) => {
   }
 }
 
-export const Home = () => {
+export const Home = ({ isAuthenticated }) => {
   const [categories, setCategories] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
+  const eventsPath = isAuthenticated ? '/events' : '/login'
+  const createEventPath = isAuthenticated ? '/events/create' : '/login'
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -52,10 +54,10 @@ export const Home = () => {
           <h1>Discover events. Meet people. Build community.</h1>
           <p>Find local events that match your interests and connect with people around you.</p>
           <div className='hero-actions'>
-            <Link to='/events' className='btn btn-primary'>
+            <Link to={eventsPath} className='btn btn-primary'>
               Browse Events
             </Link>
-            <Link to='/signup' className='btn btn-secondary'>
+            <Link to={createEventPath} className='btn btn-secondary'>
               Host an Event
             </Link>
           </div>
@@ -67,7 +69,7 @@ export const Home = () => {
       <section id='upcoming-events' className='section'>
         <div className='section-header'>
           <h2>Upcoming Events</h2>
-          <Link to='/events'>View all</Link>
+          <Link to={eventsPath}>View all</Link>
         </div>
 
         <div className='event-grid'>

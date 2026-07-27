@@ -53,7 +53,7 @@ export const SignUp = () => {
         password: form.password,
       })
       saveSession(payload)
-      navigate('/events')
+      navigate('/home')
     } catch (err) {
       setError(err.message)
     } finally {
