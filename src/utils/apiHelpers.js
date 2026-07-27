@@ -26,8 +26,10 @@ export const createEvent = async (eventData) => {
 
 export const getEventById = async (eventId) => {
   try {
-    const response = await apiClient.get(`/api/events/${eventId}`)
-    return response.data
+    const event = await apiClient.get(`/api/events/${eventId}`)
+    const organizerId = event.data.organizer_id
+    const organizer = await apiClient.get(`/api/users/${organizerId}`)
+    return { ...event.data, organizer: organizer.data[0] }
   } catch (error) {
     throw new Error(extractErrorMessage(error))
   }
