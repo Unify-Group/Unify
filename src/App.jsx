@@ -4,6 +4,7 @@ import './App.css'
 import { Navbar } from './components/Navbar'
 import { BrowseEvents } from './pages/BrowseEvents'
 import { CreateEvent } from './pages/CreateEvent'
+import { EditEvent } from './pages/EditEvent'
 import { Home } from './pages/Home'
 import { HomeDashboard } from './pages/HomeDashboard'
 import { Profile } from './pages/Profile'
@@ -43,6 +44,10 @@ function App() {
     {
       path: '/events/create',
       element: isAuthenticated ? <CreateEvent /> : <Navigate to='/login' replace />,
+    },
+    {
+      path: '/events/:id/edit',
+      element: isAuthenticated ? <EditEvent /> : <Navigate to='/login' replace />,
     },
     {
       path: '/events',

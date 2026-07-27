@@ -22,12 +22,23 @@ const initialsFromUser = (user) => {
   return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() || 'U'
 }
 
+const DASHBOARD_MESSAGES = [
+  "Here's what's happening in your community.",
+  'Your next great connection starts here.',
+  'Fresh events are waiting for you.',
+  'Find something fun to join today.',
+]
+
 export const HomeDashboard = () => {
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
   const savedUser = getSavedUser()
   const user = dashboard?.user || savedUser
   const firstName = user?.first_name || user?.firstName || 'there'
+  const avatarUrl = String(user?.profile?.avatar_url || user?.avatar_url || '').trim()
+  const messageSeed = Number(user?.id) || firstName.length || 0
+  const messageIndex = (new Date().getDate() + messageSeed) % DASHBOARD_MESSAGES.length
+  const heroMessage = DASHBOARD_MESSAGES[messageIndex]
   const interests = String(user?.profile?.interests || '')
     .split(',')
     .map((value) => value.trim())
@@ -87,7 +98,7 @@ export const HomeDashboard = () => {
         <div className='dashboard-topbar'>
           <div>
             <h1>Welcome back, {firstName} <span aria-hidden='true'>👋</span></h1>
-            <p>{user?.profile?.bio || 'Here\'s what\'s happening in your community.'}</p>
+            <p>{heroMessage}</p>
             {interests.length > 0 && (
               <div className='dashboard-interest-list'>
                 {interests.map((interest) => (
@@ -102,7 +113,11 @@ export const HomeDashboard = () => {
           <div className='dashboard-topbar-actions'>
             <Link to='/events/create' className='create-event-btn'>Create Event</Link>
             <div className='dashboard-avatar' aria-label='Profile avatar'>
-              {initialsFromUser(user)}
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={`${firstName} profile`} />
+              ) : (
+                initialsFromUser(user)
+              )}
             </div>
           </div>
         </div>

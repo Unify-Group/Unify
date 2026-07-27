@@ -6,6 +6,13 @@ import eventData from './data/events.js'
 import rsvpData from './data/rsvps.js'
 import profileData from './data/profiles.js'
 
+if (!process.argv.includes('--force')) {
+  console.error('Refusing to reset database without explicit confirmation.')
+  console.error('This command deletes ALL users, profiles, events, categories, and RSVPs.')
+  console.error('Run again with: npm run reset -- --force')
+  process.exit(1)
+}
+
 const createUsersTable = async () => {
   const createTableQuery = `
         DROP TABLE IF EXISTS users CASCADE;
@@ -46,7 +53,9 @@ const createProfilesTable = async () => {
             user_id INT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
             bio TEXT,
             interests TEXT,
-            avatar_url TEXT
+          avatar_url TEXT,
+          pronouns VARCHAR(80),
+          identity_labels TEXT
         )
     `
 
@@ -122,14 +131,21 @@ const seedUsersTable = async () => {
 
 const seedProfilesTable = async () => {
   const insertQuery = `
-        INSERT INTO profiles (user_id, bio, interests, avatar_url)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO profiles (user_id, bio, interests, avatar_url, pronouns, identity_labels)
+        VALUES ($1, $2, $3, $4, $5, $6)
     `
 
   try {
     await Promise.all(
       profileData.map((profile) =>
-        pool.query(insertQuery, [profile.user_id, profile.bio, profile.interests, profile.avatar_url])
+        pool.query(insertQuery, [
+          profile.user_id,
+          profile.bio,
+          profile.interests,
+          profile.avatar_url,
+          profile.pronouns,
+          profile.identity_labels,
+        ])
       )
     )
     console.log('✅ profiles seeded successfully')

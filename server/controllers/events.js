@@ -1,5 +1,26 @@
 import { pool } from '../config/db.js'
 
+const eventSelect = `
+  SELECT
+    e.*, c.name AS category_name
+  FROM events e
+  LEFT JOIN categories c ON c.id = e.category_id
+`
+
+const requireOrganizer = async (eventId, userId) => {
+  const result = await pool.query('SELECT organizer_id FROM events WHERE id = $1', [eventId])
+
+  if (result.rows.length === 0) {
+    return { error: { status: 404, message: 'Event not found' } }
+  }
+
+  if (result.rows[0].organizer_id !== userId) {
+    return { error: { status: 403, message: 'You can only edit your own events' } }
+  }
+
+  return { ok: true }
+}
+
 const createEvent = async (req, res) => {
   const { title, description, datetime, location, attendee_limit, category_id } = req.body
   const organizer_id = req.user?.id
@@ -33,8 +54,7 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    const selectQuery = 'SELECT * FROM events ORDER BY datetime ASC'
-    const result = await pool.query(selectQuery)
+    const result = await pool.query(`${eventSelect} ORDER BY e.datetime ASC`)
     res.status(200).json(result.rows)
   } catch (err) {
     res.status(409).json({ error: err.message })
@@ -45,8 +65,7 @@ const getAllEvents = async (req, res) => {
 const getEventById = async (req, res) => {
   const id = parseInt(req.params.id)
   try {
-    const selectQuery = 'SELECT * FROM events WHERE id = $1'
-    const result = await pool.query(selectQuery, [id])
+    const result = await pool.query(`${eventSelect} WHERE e.id = $1`, [id])
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Event not found' })
     }
@@ -57,8 +76,72 @@ const getEventById = async (req, res) => {
   }
 }
 
+const updateEvent = async (req, res) => {
+  const id = parseInt(req.params.id)
+  const organizerId = req.user?.id
+  const { title, description, datetime, location, attendee_limit, category_id } = req.body
+
+  if (!organizerId) {
+    return res.status(401).json({ message: 'Authentication required' })
+  }
+
+  try {
+    const access = await requireOrganizer(id, organizerId)
+
+    if (access.error) {
+      return res.status(access.error.status).json({ error: access.error.message })
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE events
+      SET
+        title = $1,
+        description = $2,
+        datetime = $3,
+        location = $4,
+        attendee_limit = $5,
+        category_id = $6
+      WHERE id = $7
+      RETURNING *
+      `,
+      [title, description, datetime, location, attendee_limit, category_id, id],
+    )
+
+    res.status(200).json(result.rows[0])
+  } catch (err) {
+    res.status(409).json({ error: err.message })
+    console.error('🚫 error to UPDATE event:', err)
+  }
+}
+
+const deleteEvent = async (req, res) => {
+  const id = parseInt(req.params.id)
+  const organizerId = req.user?.id
+
+  if (!organizerId) {
+    return res.status(401).json({ message: 'Authentication required' })
+  }
+
+  try {
+    const access = await requireOrganizer(id, organizerId)
+
+    if (access.error) {
+      return res.status(access.error.status).json({ error: access.error.message })
+    }
+
+    await pool.query('DELETE FROM events WHERE id = $1', [id])
+    res.status(204).send()
+  } catch (err) {
+    res.status(409).json({ error: err.message })
+    console.error('🚫 error to DELETE event:', err)
+  }
+}
+
 export default {
   createEvent,
   getAllEvents,
   getEventById,
+  updateEvent,
+  deleteEvent,
 }

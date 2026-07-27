@@ -24,8 +24,25 @@ const mapCurrentUser = (row) => ({
     bio: row.bio,
     interests: row.interests,
     avatar_url: row.profile_avatar_url,
+    pronouns: row.pronouns,
+    identity_labels: row.identity_labels,
   },
 })
+
+const normalizeCommaSeparated = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean)
+      .join(', ')
+  }
+
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(', ')
+}
 
 const parseInterestTerms = (interests) =>
   String(interests || '')
@@ -52,6 +69,34 @@ const throwHttpError = (status, message, code = 'REQUEST_ERROR', details = null)
   err.code = code
   err.details = details
   throw err
+}
+
+const resolveAuthenticatedUser = async (authUser, client = pool) => {
+  const userId = typeof authUser === 'object' ? authUser?.id : authUser
+  const email = typeof authUser === 'object' ? authUser?.email : null
+
+  if (!userId && !email) {
+    throwHttpError(401, 'Unauthorized', 'AUTH_REQUIRED')
+  }
+
+  if (userId) {
+    const byId = await client.query('SELECT id, email FROM users WHERE id = $1', [userId])
+
+    if (byId.rows.length > 0) {
+      return byId.rows[0]
+    }
+  }
+
+  if (email) {
+    const normalizedEmail = String(email).toLowerCase().trim()
+    const byEmail = await client.query('SELECT id, email FROM users WHERE email = $1', [normalizedEmail])
+
+    if (byEmail.rows.length > 0) {
+      return byEmail.rows[0]
+    }
+  }
+
+  throwHttpError(404, 'User not found')
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -191,12 +236,9 @@ export const loginUser = async (payload) => {
   }
 }
 
-export const getCurrentUser = async (userId) => {
-  if (!userId) {
-    throwHttpError(401, 'Unauthorized', 'AUTH_REQUIRED')
-  }
-
+export const getCurrentUser = async (authUser) => {
   try {
+    const resolvedUser = await resolveAuthenticatedUser(authUser)
     const result = await pool.query(
       `
       SELECT
@@ -209,12 +251,14 @@ export const getCurrentUser = async (userId) => {
         u.created_at,
         p.bio,
         p.interests,
-        p.avatar_url AS profile_avatar_url
+        p.avatar_url AS profile_avatar_url,
+        p.pronouns,
+        p.identity_labels
       FROM users u
       LEFT JOIN profiles p ON p.user_id = u.id
       WHERE u.id = $1
       `,
-      [userId]
+      [resolvedUser.id]
     )
 
     if (result.rows.length === 0) {
@@ -236,11 +280,8 @@ export const getCurrentUser = async (userId) => {
 }
 
 export const getDashboardData = async (userId) => {
-  if (!userId) {
-    throwHttpError(401, 'Unauthorized', 'AUTH_REQUIRED')
-  }
-
   try {
+    const resolvedUser = await resolveAuthenticatedUser(userId)
     const userResult = await pool.query(
       `
       SELECT
@@ -253,12 +294,14 @@ export const getDashboardData = async (userId) => {
         u.created_at,
         p.bio,
         p.interests,
-        p.avatar_url AS profile_avatar_url
+        p.avatar_url AS profile_avatar_url,
+        p.pronouns,
+        p.identity_labels
       FROM users u
       LEFT JOIN profiles p ON p.user_id = u.id
       WHERE u.id = $1
       `,
-      [userId]
+      [resolvedUser.id]
     )
 
     if (userResult.rows.length === 0) {
@@ -288,7 +331,7 @@ export const getDashboardData = async (userId) => {
       WHERE r.user_id = $1 AND r.status = 'attending'
       ORDER BY e.datetime ASC
       `,
-      [userId]
+      [resolvedUser.id]
     )
 
     const hostedResult = await pool.query(
@@ -309,7 +352,7 @@ export const getDashboardData = async (userId) => {
       WHERE e.organizer_id = $1
       ORDER BY e.datetime ASC
       `,
-      [userId]
+      [resolvedUser.id]
     )
 
     const relatedConnectionsResult = await pool.query(
@@ -322,7 +365,7 @@ export const getDashboardData = async (userId) => {
        AND related.status = 'attending'
       WHERE mine.user_id = $1 AND mine.status = 'attending'
       `,
-      [userId]
+      [resolvedUser.id]
     )
 
     const allEventsResult = await pool.query(
@@ -388,5 +431,85 @@ export const getDashboardData = async (userId) => {
     }
 
     throwHttpError(500, 'Failed to load dashboard', 'DASHBOARD_FAILED')
+  }
+}
+
+export const updateCurrentUserProfile = async (authUser, payload) => {
+  const firstName = String(payload.first_name ?? payload.firstName ?? '').trim()
+  const lastName = String(payload.last_name ?? payload.lastName ?? '').trim()
+  const bio = String(payload.bio ?? '').trim() || null
+  const avatarUrl = String(payload.avatar_url ?? payload.avatarUrl ?? '').trim() || null
+  const pronouns = String(payload.pronouns ?? '').trim() || null
+  const interests = normalizeCommaSeparated(payload.interests)
+  const identityLabels = normalizeCommaSeparated(payload.identity_labels ?? payload.identityLabels)
+
+  if (!firstName || !lastName) {
+    throwHttpError(400, 'First and last name are required', 'VALIDATION_ERROR')
+  }
+
+  const client = await pool.connect()
+
+  try {
+    await client.query('BEGIN')
+    const resolvedUser = await resolveAuthenticatedUser(authUser, client)
+
+    const userResult = await client.query(
+      `
+      UPDATE users
+      SET first_name = $1, last_name = $2, avatar_url = $3
+      WHERE id = $4
+      RETURNING id, first_name, last_name, email, provider, avatar_url, created_at
+      `,
+      [firstName, lastName, avatarUrl, resolvedUser.id],
+    )
+
+    if (userResult.rows.length === 0) {
+      await client.query('ROLLBACK')
+      throwHttpError(404, 'User not found')
+    }
+
+    const profileUpdate = await client.query(
+      `
+      UPDATE profiles
+      SET bio = $1,
+          interests = $2,
+          avatar_url = $3,
+          pronouns = $4,
+          identity_labels = $5
+      WHERE user_id = $6
+      `,
+      [
+        bio,
+        interests || null,
+        avatarUrl,
+        pronouns,
+        identityLabels || null,
+        resolvedUser.id,
+      ],
+    )
+
+    if (profileUpdate.rowCount === 0) {
+      await client.query(
+        `
+        INSERT INTO profiles (user_id, bio, interests, avatar_url, pronouns, identity_labels)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [resolvedUser.id, bio, interests || null, avatarUrl, pronouns, identityLabels || null],
+      )
+    }
+
+    await client.query('COMMIT')
+
+    return getCurrentUser({ id: resolvedUser.id, email: resolvedUser.email })
+  } catch (err) {
+    await client.query('ROLLBACK')
+
+    if (err.status) {
+      throw err
+    }
+
+    throwHttpError(500, 'Failed to update profile', 'PROFILE_UPDATE_FAILED')
+  } finally {
+    client.release()
   }
 }

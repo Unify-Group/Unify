@@ -12,6 +12,18 @@ const toJsonOrThrow = async (promise) => {
   }
 }
 
+const handleStaleSession = (error) => {
+  const status = error?.response?.status
+  const message = extractErrorMessage(error)
+
+  if (status === 401 || status === 404) {
+    clearSession()
+    throw new Error('Your session is out of date. Please sign in again.')
+  }
+
+  throw new Error(message)
+}
+
 export const signup = async ({ first_name, last_name, email, password }) => {
   return toJsonOrThrow(
     apiClient.post('/api/auth/signup', {
@@ -49,9 +61,13 @@ export const refreshCurrentUser = async () => {
     return null
   }
 
-  const payload = await fetchCurrentUser(token)
-  saveSession({ token, user: payload.user })
-  return payload.user
+  try {
+    const payload = await fetchCurrentUser(token)
+    saveSession({ token, user: payload.user })
+    return payload.user
+  } catch (error) {
+    handleStaleSession(error)
+  }
 }
 
 export const fetchDashboardData = async () => {
@@ -61,19 +77,53 @@ export const fetchDashboardData = async () => {
     throw new Error('Authentication required')
   }
 
-  const payload = await toJsonOrThrow(
-    apiClient.get('/api/auth/dashboard', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }),
-  )
+  let payload
+
+  try {
+    payload = await toJsonOrThrow(
+      apiClient.get('/api/auth/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    )
+  } catch (error) {
+    handleStaleSession(error)
+  }
 
   if (payload.user) {
     saveSession({ token, user: payload.user })
   }
 
   return payload
+}
+
+export const updateCurrentUserProfile = async (profileData) => {
+  const token = getSavedToken()
+
+  if (!token) {
+    throw new Error('Authentication required')
+  }
+
+  let payload
+
+  try {
+    payload = await toJsonOrThrow(
+      apiClient.put('/api/auth/me', profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    )
+  } catch (error) {
+    handleStaleSession(error)
+  }
+
+  if (payload.user) {
+    saveSession({ token, user: payload.user })
+  }
+
+  return payload.user
 }
 
 export const saveSession = ({ token, user }) => {
