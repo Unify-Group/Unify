@@ -1,4 +1,5 @@
 import { pool } from '../config/db.js'
+import { handleError } from '../utils/handleError.js'
 
 const eventSelect = `
   SELECT
@@ -26,7 +27,11 @@ const createEvent = async (req, res) => {
   const organizer_id = req.user?.id
 
   if (!organizer_id) {
-    return res.status(401).json({ message: 'Authentication required' })
+    return handleError(
+      res,
+      { status: 401, code: 'AUTH_REQUIRED', message: 'Authentication required' },
+      'Authentication required',
+    )
   }
 
   try {
@@ -47,8 +52,8 @@ const createEvent = async (req, res) => {
     res.status(201).json(result.rows[0])
     console.log('🆕 event created successfully:', result.rows[0])
   } catch (err) {
-    res.status(409).json({ error: err.message })
     console.error('🚫 error to CREATE event:', err)
+    return handleError(res, err, 'Failed to create event')
   }
 }
 
@@ -57,8 +62,8 @@ const getAllEvents = async (req, res) => {
     const result = await pool.query(`${eventSelect} ORDER BY e.datetime ASC`)
     res.status(200).json(result.rows)
   } catch (err) {
-    res.status(409).json({ error: err.message })
     console.error('🚫 error to GET events:', err)
+    return handleError(res, err, 'Failed to load events')
   }
 }
 
@@ -67,12 +72,16 @@ const getEventById = async (req, res) => {
   try {
     const result = await pool.query(`${eventSelect} WHERE e.id = $1`, [id])
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Event not found' })
+      return handleError(
+        res,
+        { status: 404, code: 'NOT_FOUND', message: 'Event not found' },
+        'Event not found',
+      )
     }
     res.status(200).json(result.rows[0])
   } catch (err) {
-    res.status(409).json({ error: err.message })
     console.error('🚫 error to GET event by ID:', err)
+    return handleError(res, err, 'Failed to load event')
   }
 }
 

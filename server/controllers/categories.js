@@ -1,4 +1,5 @@
 import { pool } from '../config/db.js'
+import { handleError } from '../utils/handleError.js'
 
 const getAllCategories = async (req, res) => {
   try {
@@ -6,8 +7,8 @@ const getAllCategories = async (req, res) => {
     const result = await pool.query(selectQuery)
     res.status(200).json(result.rows)
   } catch (err) {
-    res.status(409).json({ error: err.message })
     console.error('🚫 error to GET categories:', err)
+    return handleError(res, err, 'Failed to load categories')
   }
 }
 
