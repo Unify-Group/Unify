@@ -1,5 +1,6 @@
 import { getEvents } from '../utils/apiHelpers.js'
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const formatDate = (dateValue) => {
   try {
@@ -85,7 +86,11 @@ export const BrowseEvents = () => {
                     {event.location} · {formatDate(event.datetime)}
                   </p>
                 </div>
-                <button type='button'>View Details</button>
+                <button type='button' className='browse-card-link'>
+                  <Link to={`/events/${event.id}`}>
+                    View Details
+                  </Link>
+                </button>
               </article>
             ))}
           </div>

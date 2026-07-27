@@ -3,6 +3,7 @@ import { Navigate, useLocation, useRoutes } from 'react-router-dom'
 import './App.css'
 import { Navbar } from './components/Navbar'
 import { BrowseEvents } from './pages/BrowseEvents'
+import { EventDetails } from './pages/EventDetails'
 import { CreateEvent } from './pages/CreateEvent'
 import { EditEvent } from './pages/EditEvent'
 import { Home } from './pages/Home'
@@ -52,6 +53,10 @@ function App() {
     {
       path: '/events',
       element: isAuthenticated ? <BrowseEvents /> : <Navigate to='/login' replace />,
+    },
+    {
+      path: '/events/:id',
+      element: isAuthenticated ? <EventDetails /> : <Navigate to='/login' replace />,
     },
     {
       path: '/profile',
