@@ -30,19 +30,19 @@ Database: PostgreSQL
 
 To browse and join local events, users need to create an account with their email.
 
-[gif goes here]
+<img src='./planning/Gif Pics/User Registration (Without Github: Google OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event creation
 
 Users can create a new event with a name, description, date, location, and category so others can discover and join it.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Edit Event Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event browsing
 
 Users can view a list of upcoming events to discover things happening near them.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Event Browsing (Not Completed).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Category filtering
 
@@ -84,7 +84,7 @@ Users can see how many people are attending an event to gauge its size and popul
 
 Users can edit the details of an event they created to keep attendees informed with accurate information.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Edit Event Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event deletion
 
@@ -102,7 +102,20 @@ Users can view the list of attendees for their event to plan accordingly for cap
 
 Users can view a profile page showing the events they're organizing and the ones they've RSVP'd to, so they can track their activity in one place.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Profile Dashboard : Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+
+### Landing Page
+
+Before A user login/sign up they see the landing page showing what the applications is about.
+
+<img src='./planning/Gif Pics/Landing Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+
+### Homepage Dashboard
+
+When a user login/sign up it shows a personalized homepage dashboard about their data and recommendations.
+
+<img src='./planning/Gif Pics/Home dashboard (Personalized).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+
 
 ## Installation Instructions
 
