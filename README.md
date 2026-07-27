@@ -30,7 +30,7 @@ Database: PostgreSQL
 
 To browse and join local events, users need to create an account with their email.
 
-<img src='./planning/Gif Pics/User Registration (Without Github: Google OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/User Registration (Without Github - Google OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event creation
 
@@ -102,7 +102,7 @@ Users can view the list of attendees for their event to plan accordingly for cap
 
 Users can view a profile page showing the events they're organizing and the ones they've RSVP'd to, so they can track their activity in one place.
 
-<img src='./planning/Gif Pics/Profile Dashboard : Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Profile Dashboard - Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Landing Page
 
