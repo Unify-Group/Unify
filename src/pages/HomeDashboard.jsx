@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getEvents } from '../utils/apiHelpers.js'
-import { getSavedUser } from '../utils/authClient'
+import { fetchDashboardData, getSavedUser } from '../utils/authClient'
 
 const formatDate = (dateValue) => {
   try {
@@ -24,39 +23,57 @@ const initialsFromUser = (user) => {
 }
 
 export const HomeDashboard = () => {
-  const [events, setEvents] = useState([])
+  const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
-  const user = getSavedUser()
+  const savedUser = getSavedUser()
+  const user = dashboard?.user || savedUser
   const firstName = user?.first_name || user?.firstName || 'there'
+  const interests = String(user?.profile?.interests || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
 
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadDashboard = async () => {
       try {
-        const payload = await getEvents()
-        setEvents(payload)
+        const payload = await fetchDashboardData()
+        setDashboard(payload)
       } catch {
-        setEvents([])
+        setDashboard(null)
       } finally {
         setLoading(false)
       }
     }
 
-    loadEvents()
+    loadDashboard()
   }, [])
 
-  const upNextEvent = events[0] || null
-  const recommendedEvents = events.slice(0, 4)
-  const stats = [
-    { label: 'Events Attending', value: Math.min(events.length, 3), tone: 'indigo' },
-    { label: 'Events Hosting', value: Math.min(Math.max(events.length - 1, 0), 2), tone: 'orange' },
-    { label: 'Connections', value: Math.max(24, events.length * 32), tone: 'green' },
+  const dashboardStats = dashboard?.stats || {
+    attendingCount: 0,
+    hostingCount: 0,
+    connectionsCount: 0,
+  }
+  const upNextEvent = dashboard?.upNextEvent || null
+  const recommendedEvents = dashboard?.recommendedEvents || []
+  const hostedEvents = dashboard?.hostedEvents || []
+  const attendingEvents = dashboard?.attendingEvents || []
+  const statCards = [
+    { label: 'Events Attending', value: dashboardStats.attendingCount, tone: 'indigo' },
+    { label: 'Events Hosting', value: dashboardStats.hostingCount, tone: 'orange' },
+    { label: 'Connections', value: dashboardStats.connectionsCount, tone: 'green' },
   ]
 
   const recentActivity = upNextEvent
     ? [
-        `${firstName} RSVP'd to ${upNextEvent.title}`,
-        `${Math.max(18, events.length * 14)} people are going to ${upNextEvent.title}`,
-        `New recommendations are ready based on your recent activity`,
+        attendingEvents[0]
+          ? `You're attending ${attendingEvents[0].title}`
+          : `You're hosting ${upNextEvent.title}`,
+        hostedEvents[0]
+          ? `${hostedEvents[0].title} is one of your hosted events`
+          : `${dashboardStats.connectionsCount} connections overlap with your events`,
+        interests.length > 0
+          ? `Recommendations are tuned to ${interests.slice(0, 2).join(' and ')}`
+          : 'Recommendations are based on your current activity',
       ]
     : [
         'Your next event activity will show up here.',
@@ -70,7 +87,16 @@ export const HomeDashboard = () => {
         <div className='dashboard-topbar'>
           <div>
             <h1>Welcome back, {firstName} <span aria-hidden='true'>👋</span></h1>
-            <p>Here&apos;s what&apos;s happening in your community.</p>
+            <p>{user?.profile?.bio || 'Here\'s what\'s happening in your community.'}</p>
+            {interests.length > 0 && (
+              <div className='dashboard-interest-list'>
+                {interests.map((interest) => (
+                  <span key={interest} className='dashboard-interest-pill'>
+                    {interest}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className='dashboard-topbar-actions'>
@@ -82,7 +108,7 @@ export const HomeDashboard = () => {
         </div>
 
         <div className='dashboard-stats'>
-          {stats.map((item) => (
+          {statCards.map((item) => (
             <article key={item.label} className='dashboard-stat-card'>
               <div className={`dashboard-stat-badge ${item.tone}`}>{item.value}</div>
               <div>
@@ -109,7 +135,13 @@ export const HomeDashboard = () => {
                     ? 'Loading your next event...'
                     : 'Join an event to start building your schedule.'}
               </p>
-              <span>{upNextEvent ? `You're going` : 'Suggested for you'}</span>
+              <span>
+                {attendingEvents.some((event) => event.id === upNextEvent?.id)
+                  ? `You're going`
+                  : upNextEvent
+                    ? 'You are hosting'
+                    : 'Suggested for you'}
+              </span>
             </div>
             <Link to='/events' className='dashboard-outline-btn'>View Details</Link>
           </article>

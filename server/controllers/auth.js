@@ -1,4 +1,4 @@
-import { getCurrentUser, loginUser, signupUser } from '../services/authService.js'
+import { getCurrentUser, getDashboardData, loginUser, signupUser } from '../services/authService.js'
 
 const handleError = (res, err, fallbackMessage) => {
   const status = err.status || 500
@@ -36,5 +36,14 @@ export const me = async (req, res) => {
     return res.status(200).json(result)
   } catch (err) {
     return handleError(res, err, 'Failed to load current user')
+  }
+}
+
+export const dashboard = async (req, res) => {
+  try {
+    const result = await getDashboardData(req.user?.id)
+    return res.status(200).json(result)
+  } catch (err) {
+    return handleError(res, err, 'Failed to load dashboard')
   }
 }

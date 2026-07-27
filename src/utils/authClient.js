@@ -54,6 +54,28 @@ export const refreshCurrentUser = async () => {
   return payload.user
 }
 
+export const fetchDashboardData = async () => {
+  const token = getSavedToken()
+
+  if (!token) {
+    throw new Error('Authentication required')
+  }
+
+  const payload = await toJsonOrThrow(
+    apiClient.get('/api/auth/dashboard', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+  )
+
+  if (payload.user) {
+    saveSession({ token, user: payload.user })
+  }
+
+  return payload
+}
+
 export const saveSession = ({ token, user }) => {
   localStorage.setItem(TOKEN_KEY, token)
   localStorage.setItem(USER_KEY, JSON.stringify(user))
