@@ -14,6 +14,19 @@ const toDateInputValue = (dateValue) => {
   }
 }
 
+const getCurrentMinDateTime = () => {
+  const now = new Date()
+  const pad = (value) => String(value).padStart(2, '0')
+
+  const year = now.getFullYear()
+  const month = pad(now.getMonth() + 1)
+  const day = pad(now.getDate())
+  const hours = pad(now.getHours())
+  const minutes = pad(now.getMinutes())
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
 export const EditEvent = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -102,11 +115,21 @@ export const EditEvent = () => {
   }
 
   if (loading) {
-    return <section className='event-form-page'><div className='event-form-shell'>Loading event...</div></section>
+    return (
+      <section className='event-form-page'>
+        <div className='event-form-shell'>Loading event...</div>
+      </section>
+    )
   }
 
   if (error && !formData.title) {
-    return <section className='event-form-page'><div className='event-form-shell'><p className='browse-error'>{error}</p></div></section>
+    return (
+      <section className='event-form-page'>
+        <div className='event-form-shell'>
+          <p className='browse-error'>{error}</p>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -114,11 +137,18 @@ export const EditEvent = () => {
       <div className='event-form-shell'>
         <div className='event-form-head'>
           <div>
-            <Link to='/profile' className='event-back-link'>Back to profile</Link>
+            <Link to='/profile' className='event-back-link'>
+              Back to profile
+            </Link>
             <h1>Edit Event</h1>
           </div>
 
-          <button type='button' className='event-delete-link' onClick={handleDelete} disabled={saving}>
+          <button
+            type='button'
+            className='event-delete-link'
+            onClick={handleDelete}
+            disabled={saving}
+          >
             Delete Event
           </button>
         </div>
@@ -127,44 +157,89 @@ export const EditEvent = () => {
           <div className='event-form-grid'>
             <div>
               <label htmlFor='title'>Event Title</label>
-              <input id='title' name='title' value={formData.title} onChange={handleChange} required />
+              <input
+                id='title'
+                name='title'
+                value={formData.title}
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div>
-              <label htmlFor='datetime'>Time</label>
-              <input id='datetime' name='datetime' type='datetime-local' value={formData.datetime} onChange={handleChange} required />
+              <label htmlFor='datetime'>Date & Time</label>
+              <input
+                id='datetime'
+                name='datetime'
+                type='datetime-local'
+                value={formData.datetime}
+                onChange={handleChange}
+                min={getCurrentMinDateTime()}
+                required
+              />
             </div>
 
             <div>
-              <label htmlFor='category'>Category</label>
-              <select id='category' name='category' value={formData.category} onChange={handleChange}>
+              <label htmlFor='category'>Category (optional)</label>
+              <select
+                id='category'
+                name='category'
+                value={formData.category}
+                onChange={handleChange}
+              >
                 <option value=''>Select a category</option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{category.name}</option>
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor='attendee_limit'>Capacity</label>
-              <input id='attendee_limit' name='attendee_limit' type='number' min='1' value={formData.attendee_limit} onChange={handleChange} />
+              <label htmlFor='attendee_limit'>Capacity (optional)</label>
+              <input
+                id='attendee_limit'
+                name='attendee_limit'
+                type='number'
+                min='1'
+                value={formData.attendee_limit}
+                onChange={handleChange}
+              />
             </div>
 
             <div className='event-form-grid-full'>
               <label htmlFor='location'>Location</label>
-              <input id='location' name='location' value={formData.location} onChange={handleChange} required />
+              <input
+                id='location'
+                name='location'
+                value={formData.location}
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div className='event-form-grid-full'>
               <label htmlFor='description'>Description</label>
-              <textarea id='description' name='description' rows='5' value={formData.description} onChange={handleChange} required />
+              <textarea
+                id='description'
+                name='description'
+                rows='5'
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 
           {error && <p className='auth-error'>{error}</p>}
 
           <div className='event-form-actions'>
-            <button type='button' className='btn btn-secondary' onClick={() => navigate('/profile')}>
+            <button
+              type='button'
+              className='btn btn-secondary'
+              onClick={() => navigate('/profile')}
+            >
               Cancel
             </button>
             <button type='submit' className='btn btn-primary' disabled={saving}>

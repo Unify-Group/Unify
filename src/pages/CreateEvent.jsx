@@ -25,14 +25,19 @@ export const CreateEvent = () => {
   })
 
   const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const loadCategories = async () => {
       try {
         const categories = await getCategories()
         setCategories(categories)
-      } catch (error) {
-        console.error(error)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -46,17 +51,31 @@ export const CreateEvent = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setError('')
+    setSaving(true)
 
-    const eventData = {
-      title: formData.title,
-      description: formData.description,
-      datetime: formData.datetime,
-      location: formData.location,
-      attendee_limit: formData.attendee_limit ? Number(formData.attendee_limit) : null,
-      category_id: formData.category || null,
+    try {
+      await createEvent({
+        title: formData.title,
+        description: formData.description,
+        datetime: formData.datetime,
+        location: formData.location,
+        attendee_limit: formData.attendee_limit ? Number(formData.attendee_limit) : null,
+        category_id: formData.category || null,
+      })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
     }
+  }
 
-    await createEvent(eventData)
+  if (loading) {
+    return (
+      <section className='event-form-page'>
+        <div className='event-form-shell'>Loading event form...</div>
+      </section>
+    )
   }
 
   return (
@@ -137,11 +156,18 @@ export const CreateEvent = () => {
         ></textarea>
       </fieldset>
 
+      {error && <p className='auth-error'>{error}</p>}
+
       <div className='form-buttons'>
-        <button type='submit' className='btn btn-primary'>
-          Create Event
+        <button type='submit' className='btn btn-primary' disabled={saving}>
+          {saving ? 'Creating...' : 'Create Event'}
         </button>
-        <button type='button' className='btn btn-secondary' onClick={() => window.history.back()}>
+        <button
+          type='button'
+          className='btn btn-secondary'
+          onClick={() => window.history.back()}
+          disabled={saving}
+        >
           Cancel
         </button>
       </div>
