@@ -295,9 +295,13 @@
   color: #dc2626;
 }
 
-
 .event-details-page {
   padding: 2rem 2rem 4rem 2rem;
+}
+
+.event-details-shell {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .event-details-page a {
@@ -340,7 +344,6 @@
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
-
 
 .host-container {
   display: flex;
