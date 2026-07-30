@@ -93,7 +93,7 @@ export const EditEvent = () => {
         category_id: formData.category || null,
       })
 
-      navigate('/profile')
+      window.location.href = `/events/${id}`
     } catch (err) {
       setError(err.message)
     } finally {
@@ -107,7 +107,7 @@ export const EditEvent = () => {
 
     try {
       await deleteEvent(id)
-      navigate('/profile')
+      window.location.href = '/profile'
     } catch (err) {
       setError(err.message)
       setSaving(false)
