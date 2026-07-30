@@ -4,6 +4,7 @@ import './App.css'
 import { Navbar } from './components/Navbar'
 import { BrowseEvents } from './pages/BrowseEvents'
 import { EventDetails } from './pages/EventDetails'
+import { EventAttendees } from './pages/EventAttendees'
 import { CreateEvent } from './pages/CreateEvent'
 import { EditEvent } from './pages/EditEvent'
 import { Home } from './pages/Home'
@@ -57,6 +58,10 @@ function App() {
     {
       path: '/events/:id',
       element: isAuthenticated ? <EventDetails /> : <Navigate to='/login' replace />,
+    },
+    {
+      path: '/events/:id/attendees',
+      element: isAuthenticated ? <EventAttendees /> : <Navigate to='/login' replace />,
     },
     {
       path: '/profile',

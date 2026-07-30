@@ -69,3 +69,47 @@ export const getCategories = async () => {
     throw new Error(extractErrorMessage(error))
   }
 }
+
+export const getMyRsvp = async (eventId) => {
+  try {
+    const response = await apiClient.get(`/api/rsvps/${eventId}`, getAuthConfig())
+    return response.data
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
+
+export const getAttendeeCount = async (eventId) => {
+  try {
+    const response = await apiClient.get(`/api/rsvps/${eventId}/count`)
+    return response.data.count
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
+
+export const getEventAttendees = async (eventId) => {
+  try {
+    const response = await apiClient.get(`/api/rsvps/${eventId}/attendees`)
+    return response.data
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
+
+export const createRsvp = async (eventId) => {
+  try {
+    const response = await apiClient.post(`/api/rsvps/${eventId}`, {}, getAuthConfig())
+    return response.data
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
+
+export const deleteRsvp = async (eventId) => {
+  try {
+    await apiClient.delete(`/api/rsvps/${eventId}`, getAuthConfig())
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
