@@ -74,7 +74,7 @@ Users can cancel their RSVP to free up their spot if their plans change.
 
 <img src='./planning/Gif Pics/Cancel RSVP.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Attendee count
+### Attendee Count
     
 Users can see how many people are attending an event to gauge its size and popularity before joining.
 
@@ -96,13 +96,13 @@ Users can delete an event they created to notify attendees if it's no longer hap
 
 Users can view the list of attendees for their event to plan accordingly for capacity or supplies.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Show Attendee List.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Profile dashboard
 
 Users can view a profile page showing the events they're organizing and the ones they've RSVP'd to, so they can track their activity in one place.
 
-<img src='./planning/Gif Pics/Profile Dashboard - Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Profile Dashboard Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Landing Page
 
