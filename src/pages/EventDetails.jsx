@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { getEventById, getMyRsvp, getEventAttendees, createRsvp, deleteRsvp } from '../utils/apiHelpers'
 import { getSavedUser } from '../utils/authClient'
 
 export const EventDetails = () => {
   const { id } = useParams()
+  const location = useLocation()
 
   const [event, setEvent] = useState({})
   const [loading, setLoading] = useState(true)
@@ -15,6 +16,8 @@ export const EventDetails = () => {
 
   const currentUser = getSavedUser()
   const isOwnEvent = Number(currentUser?.id) === Number(event?.organizer_id)
+  const backTo = location.state?.backTo || '/events'
+  const backLabel = location.state?.backLabel || 'Back to Events'
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -119,9 +122,9 @@ export const EventDetails = () => {
     <>
       <article className='event-details-page'>
         <div className='event-details-shell'>
-          <a href='/events' className='event-back-link'>
-            ⬅ Back to Events
-          </a>
+          <Link to={backTo} className='event-back-link'>
+            ⬅ {backLabel}
+          </Link>
 
           <div className='event-details-sections'>
             <section className='event-details-section info'>
@@ -158,13 +161,15 @@ export const EventDetails = () => {
                     )}
                     {event.organizer && (
                       <span className='host-name'>
-                        <h4>{`${event.organizer?.first_name} ${event.organizer?.last_name}`}</h4>
+                        <h4>
+                          <Link to={`/users/${event.organizer_id}`}>{`${event.organizer?.first_name} ${event.organizer?.last_name}`}</Link>
+                        </h4>
                         <p>Organizer</p>
                       </span>
                     )}
                   </div>
                   <button type='button'>
-                    <Link to='/profile'>View Profile</Link>
+                    <Link to={`/users/${event.organizer_id}`}>View Profile</Link>
                   </button>
                 </div>
               </span>

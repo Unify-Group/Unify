@@ -10,6 +10,7 @@ import { EditEvent } from './pages/EditEvent'
 import { Home } from './pages/Home'
 import { HomeDashboard } from './pages/HomeDashboard'
 import { Profile } from './pages/Profile'
+import { PublicProfile } from './pages/PublicProfile'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
 import { clearSession, getSavedToken, refreshCurrentUser } from './utils/authClient'
@@ -66,6 +67,10 @@ function App() {
     {
       path: '/profile',
       element: isAuthenticated ? <Profile /> : <Navigate to='/login' replace />,
+    },
+    {
+      path: '/users/:id',
+      element: isAuthenticated ? <PublicProfile /> : <Navigate to='/login' replace />,
     },
     {
       path: '/signup',

@@ -1049,6 +1049,193 @@
   min-height: calc(100vh - 72px);
 }
 
+.public-profile-page {
+  background: var(--bg-subtle);
+  min-height: calc(100vh - 72px);
+}
+
+.public-profile-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2.5rem;
+}
+
+.public-profile-back {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0.25rem 0;
+}
+
+.public-profile-hero {
+  margin-top: 0.65rem;
+}
+
+.public-profile-banner {
+  width: 100%;
+  min-height: 200px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), #5a4cff);
+}
+
+.public-profile-identity {
+  margin-top: -62px;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.1rem;
+  padding: 0 0.5rem;
+}
+
+.public-profile-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: 4px solid #ffffff;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+.public-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.public-profile-copy h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 2rem;
+}
+
+.public-profile-copy p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.public-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.55rem;
+  padding: 0.28rem 0.72rem;
+  border-radius: 999px;
+  background: #ebf8ef;
+  color: #15803d;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.public-profile-summary {
+  margin-top: 1.15rem;
+}
+
+.public-profile-bio {
+  margin: 0;
+  color: var(--muted);
+  max-width: 78ch;
+}
+
+.public-profile-stats {
+  margin-top: 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 580px;
+}
+
+.public-profile-stats article strong {
+  display: block;
+  color: var(--ink);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.public-profile-stats article span {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.public-profile-divider {
+  margin-top: 1.4rem;
+  border-top: 1px solid var(--border);
+}
+
+.public-profile-summary h2,
+.public-profile-events h2 {
+  margin: 1.2rem 0 0;
+  color: var(--ink);
+  font-size: 1.7rem;
+}
+
+.public-profile-interests {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.public-profile-interests span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0.4rem 0.9rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.public-profile-events p {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+
+.public-profile-event-grid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.public-profile-event-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 0.75rem;
+  text-decoration: none;
+}
+
+.public-profile-event-card h3 {
+  margin: 0.75rem 0 0.3rem;
+  color: var(--ink);
+  font-size: 1.06rem;
+}
+
+.public-profile-event-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.public-profile-event-card span {
+  margin-top: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  background: #ebf8ef;
+  color: #15803d;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
 .profile-shell {
   max-width: 1200px;
   margin: 0 auto;
@@ -1983,6 +2170,37 @@ button,
   .profile-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+
+  .public-profile-shell {
+    padding: 1rem 1rem 2rem;
+  }
+
+  .public-profile-banner {
+    min-height: 160px;
+  }
+
+  .public-profile-identity {
+    margin-top: -42px;
+    align-items: center;
+  }
+
+  .public-profile-avatar {
+    width: 88px;
+    height: 88px;
+  }
+
+  .public-profile-copy h1 {
+    font-size: 1.5rem;
+  }
+
+  .public-profile-stats {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .public-profile-event-grid {
+    grid-template-columns: 1fr;
   }
 
   .profile-edit-grid {

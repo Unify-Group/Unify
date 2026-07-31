@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
+import { parseInterestList } from '../utils/profileUtils'
 
 const IDENTITY_OPTIONS = [
   'Community Member',
@@ -95,10 +96,7 @@ export const Profile = () => {
   const user = dashboard?.user
   const hostedEvents = dashboard?.hostedEvents || []
   const attendingEvents = dashboard?.attendingEvents || []
-  const interests = String(user?.profile?.interests || '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean)
+  const interests = parseInterestList(user?.profile?.interests)
   const identityLabels = String(user?.profile?.identity_labels || '')
     .split(',')
     .map((value) => value.trim())

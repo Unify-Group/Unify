@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchDashboardData, getSavedUser } from '../utils/authClient'
+import { buildRecentActivity, parseInterestList } from '../utils/profileUtils'
 
 const formatDate = (dateValue) => {
   try {
@@ -39,10 +40,7 @@ export const HomeDashboard = () => {
   const messageSeed = Number(user?.id) || firstName.length || 0
   const messageIndex = (new Date().getDate() + messageSeed) % DASHBOARD_MESSAGES.length
   const heroMessage = DASHBOARD_MESSAGES[messageIndex]
-  const interests = String(user?.profile?.interests || '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean)
+  const interests = parseInterestList(user?.profile?.interests)
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -74,23 +72,12 @@ export const HomeDashboard = () => {
     { label: 'Connections', value: dashboardStats.connectionsCount, tone: 'green' },
   ]
 
-  const recentActivity = upNextEvent
-    ? [
-        attendingEvents[0]
-          ? `You're attending ${attendingEvents[0].title}`
-          : `You're hosting ${upNextEvent.title}`,
-        hostedEvents[0]
-          ? `${hostedEvents[0].title} is one of your hosted events`
-          : `${dashboardStats.connectionsCount} connections overlap with your events`,
-        interests.length > 0
-          ? `Recommendations are tuned to ${interests.slice(0, 2).join(' and ')}`
-          : 'Recommendations are based on your current activity',
-      ]
-    : [
-        'Your next event activity will show up here.',
-        'Invite friends to start building your community.',
-        'Recommended events will appear after you join an event.',
-      ]
+  const recentActivity = buildRecentActivity({
+    attendingEvents,
+    hostedEvents,
+    interests,
+    userCreatedAt: user?.created_at || null,
+  })
 
   return (
     <section className='dashboard-page'>
@@ -99,15 +86,6 @@ export const HomeDashboard = () => {
           <div>
             <h1>Welcome back, {firstName} <span aria-hidden='true'>👋</span></h1>
             <p>{heroMessage}</p>
-            {interests.length > 0 && (
-              <div className='dashboard-interest-list'>
-                {interests.map((interest) => (
-                  <span key={interest} className='dashboard-interest-pill'>
-                    {interest}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className='dashboard-topbar-actions'>
@@ -160,7 +138,13 @@ export const HomeDashboard = () => {
                     : 'Suggested for you'}
               </span>
             </div>
-            <Link to='/events' className='dashboard-outline-btn'>View Details</Link>
+            <Link
+              to={upNextEvent ? `/events/${upNextEvent.id}` : '/events'}
+              state={upNextEvent ? { backTo: '/home', backLabel: 'Back to Dashboard' } : undefined}
+              className='dashboard-outline-btn'
+            >
+              View Details
+            </Link>
           </article>
         </section>
 
@@ -172,14 +156,19 @@ export const HomeDashboard = () => {
 
           <div className='dashboard-grid'>
             {recommendedEvents.map((event, index) => (
-              <article key={event.id} className='dashboard-event-card'>
+              <Link
+                key={event.id}
+                to={`/events/${event.id}`}
+                state={{ backTo: '/home', backLabel: 'Back to Dashboard' }}
+                className='dashboard-event-card'
+              >
                 <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
                   {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
                 </div>
                 <h3>{event.title}</h3>
                 <p>{formatDate(event.datetime)}</p>
                 <span>{event.category_name || 'Community'}</span>
-              </article>
+              </Link>
             ))}
 
             {!recommendedEvents.length && !loading && (
@@ -195,10 +184,10 @@ export const HomeDashboard = () => {
 
           <div className='dashboard-activity-list'>
             {recentActivity.map((item, index) => (
-              <article key={`${item}-${index}`} className='dashboard-activity-item'>
+              <article key={`${item.text}-${index}`} className='dashboard-activity-item'>
                 <div className='dashboard-activity-dot'></div>
-                <p>{item}</p>
-                <span>{index === 0 ? '2h ago' : index === 1 ? '5h ago' : '1d ago'}</span>
+                <p>{item.text}</p>
+                <span>{item.relativeTime}</span>
               </article>
             ))}
           </div>

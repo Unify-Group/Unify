@@ -97,6 +97,15 @@ export const getEventAttendees = async (eventId) => {
   }
 }
 
+export const getPublicUserProfile = async (userId) => {
+  try {
+    const response = await apiClient.get(`/api/users/${userId}/public-profile`)
+    return response.data
+  } catch (error) {
+    throw new Error(extractErrorMessage(error))
+  }
+}
+
 export const createRsvp = async (eventId) => {
   try {
     const response = await apiClient.post(`/api/rsvps/${eventId}`, {}, getAuthConfig())
