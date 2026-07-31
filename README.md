@@ -48,19 +48,19 @@ Users can view a list of upcoming events to discover things happening near them.
 
 Users can filter events by category to quickly find ones that match their interests.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Category filtering.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Keyword search
 
 Users can search for events by keyword to find a specific event they already have in mind.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Keyword Search.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event details view
 
 Users can view an event's full details, including time, location, and description, to decide whether to attend.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Event details view.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### RSVP
 
@@ -78,7 +78,7 @@ Users can cancel their RSVP to free up their spot if their plans change.
     
 Users can see how many people are attending an event to gauge its size and popularity before joining.
 
-<img src='./planning/Gif Pics/Show Attendee List.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Attandee Count.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event editing
 
@@ -90,7 +90,7 @@ Users can edit the details of an event they created to keep attendees informed w
 
 Users can delete an event they created to notify attendees if it's no longer happening.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Delete Event.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Attendee list
 
