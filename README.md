@@ -66,19 +66,19 @@ Users can view an event's full details, including time, location, and descriptio
 
 Users can RSVP to an event to secure their spot and let the organizer know they're coming.
 
-[gif goes here]
+<img src='./planning/Gif Pics/RSVP.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### RSVP cancellation
 
 Users can cancel their RSVP to free up their spot if their plans change.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Cancel RSVP.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Attendee count
-
+    
 Users can see how many people are attending an event to gauge its size and popularity before joining.
 
-[gif goes here]
+<img src='./planning/Gif Pics/Show Attendee List.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event editing
 
