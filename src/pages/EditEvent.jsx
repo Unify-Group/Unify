@@ -46,6 +46,7 @@ export const EditEvent = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -137,7 +138,15 @@ export const EditEvent = () => {
     }
   }
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true)
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false)
+  }
+
+  const handleConfirmDelete = async () => {
     setError('')
     setSaving(true)
 
@@ -147,6 +156,7 @@ export const EditEvent = () => {
     } catch (err) {
       setError(err.message)
       setSaving(false)
+      setShowDeleteConfirm(false)
     }
   }
 
@@ -182,7 +192,7 @@ export const EditEvent = () => {
           <button
             type='button'
             className='event-delete-link'
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             disabled={saving}
           >
             Delete Event
@@ -329,6 +339,30 @@ export const EditEvent = () => {
           </div>
         </form>
       </div>
+
+      {showDeleteConfirm && (
+        <div className='rsvp-modal-backdrop' role='dialog' aria-modal='true' onClick={handleCancelDelete}>
+          <div className='rsvp-modal-card' onClick={(e) => e.stopPropagation()}>
+            <div className='rsvp-modal-header'>
+              <h3>Delete Event?</h3>
+              <button className='rsvp-modal-close' onClick={handleCancelDelete} aria-label='Close'>✕</button>
+            </div>
+
+            <p className='rsvp-modal-text'>
+              Are you sure you want to delete {formData.title || 'this event'}? This action cannot be undone.
+            </p>
+
+            <div className='rsvp-modal-actions'>
+              <button type='button' className='rsvp-modal-secondary' onClick={handleCancelDelete}>
+                Cancel
+              </button>
+              <button type='button' className='rsvp-modal-primary' onClick={handleConfirmDelete} disabled={saving}>
+                {saving ? 'Deleting...' : 'Delete Event'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
