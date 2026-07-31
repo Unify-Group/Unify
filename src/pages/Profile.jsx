@@ -450,7 +450,9 @@ export const Profile = () => {
               <div className='profile-attending-grid'>
                 {attendingEvents.map((event, index) => (
                   <article key={event.id} className='profile-attending-card'>
-                    <div className={`event-image ${index % 2 === 0 ? 'orange' : 'indigo'}`}></div>
+                    <div className={`event-image ${index % 2 === 0 ? 'orange' : 'indigo'}`}>
+                      {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                    </div>
                     <h3>
                       {event.title} <span> - {formatShortDate(event.datetime)}</span>
                     </h3>

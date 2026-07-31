@@ -14,6 +14,7 @@ export const EventDetails = () => {
   const [showRsvpModal, setShowRsvpModal] = useState(false)
 
   const currentUser = getSavedUser()
+  const isOwnEvent = Number(currentUser?.id) === Number(event?.organizer_id)
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -49,7 +50,7 @@ export const EventDetails = () => {
   }, [id, currentUser])
 
   const handleOpenRsvpModal = () => {
-    if (!currentUser) {
+    if (!currentUser || isOwnEvent) {
       return
     }
 
@@ -81,12 +82,20 @@ export const EventDetails = () => {
     setShowRsvpModal(false)
   }
 
-  const rsvpButtonLabel = !currentUser ? 'Sign in to RSVP' : isRsvped ? 'Cancel RSVP' : 'RSVP for Event'
+  const rsvpButtonLabel = !currentUser
+    ? 'Sign in to RSVP'
+    : isOwnEvent
+      ? 'You are the organizer'
+      : isRsvped
+        ? 'Cancel RSVP'
+        : 'RSVP for Event'
   const rsvpMessage = !currentUser
     ? 'Sign in to mark yourself as attending.'
-    : isRsvped
-      ? 'You are on the attendee list.'
-      : 'Tap below to RSVP for this event.'
+    : isOwnEvent
+      ? 'You cannot RSVP to an event you created.'
+      : isRsvped
+        ? 'You are on the attendee list.'
+        : 'Tap below to RSVP for this event.'
 
   if (loading) {
     return (
@@ -116,7 +125,9 @@ export const EventDetails = () => {
 
           <div className='event-details-sections'>
             <section className='event-details-section info'>
-              <div className='event-details-card-image' />
+              <div className='event-details-card-image'>
+                {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+              </div>
 
               <span className='event-details-heading'>
                 <h1>{event.title}</h1>
@@ -171,7 +182,7 @@ export const EventDetails = () => {
                 type='button'
                 className={`rsvp-button ${isRsvped ? 'is-active' : ''}`}
                 onClick={handleOpenRsvpModal}
-                disabled={!currentUser}
+                disabled={!currentUser || isOwnEvent}
               >
                 {rsvpButtonLabel}
               </button>

@@ -3,9 +3,15 @@ import { handleError } from '../utils/handleError.js'
 
 const eventSelect = `
   SELECT
-    e.*, c.name AS category_name
+    e.*, c.name AS category_name,
+    COALESCE(attending.attending_count, 0)::INT AS attending_count
   FROM events e
   LEFT JOIN categories c ON c.id = e.category_id
+  LEFT JOIN LATERAL (
+    SELECT COUNT(*)::INT AS attending_count
+    FROM rsvps r
+    WHERE r.event_id = e.id AND r.status = 'attending'
+  ) attending ON TRUE
 `
 
 const requireOrganizer = async (eventId, userId) => {
@@ -23,7 +29,7 @@ const requireOrganizer = async (eventId, userId) => {
 }
 
 const createEvent = async (req, res) => {
-  const { title, description, datetime, location, attendee_limit, category_id } = req.body
+  const { title, description, datetime, location, attendee_limit, category_id, image_url } = req.body
   const organizer_id = req.user?.id
 
   if (!organizer_id) {
@@ -36,8 +42,8 @@ const createEvent = async (req, res) => {
 
   try {
     const insertQuery = `
-      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id, organizer_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id, organizer_id, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `
     const result = await pool.query(insertQuery, [
@@ -48,6 +54,7 @@ const createEvent = async (req, res) => {
       attendee_limit,
       category_id,
       organizer_id,
+      image_url || null,
     ])
     res.status(201).json(result.rows[0])
     console.log('🆕 event created successfully:', result.rows[0])
@@ -88,7 +95,7 @@ const getEventById = async (req, res) => {
 const updateEvent = async (req, res) => {
   const id = parseInt(req.params.id)
   const organizerId = req.user?.id
-  const { title, description, datetime, location, attendee_limit, category_id } = req.body
+  const { title, description, datetime, location, attendee_limit, category_id, image_url } = req.body
 
   if (!organizerId) {
     return res.status(401).json({ message: 'Authentication required' })
@@ -110,11 +117,12 @@ const updateEvent = async (req, res) => {
         datetime = $3,
         location = $4,
         attendee_limit = $5,
-        category_id = $6
-      WHERE id = $7
+        category_id = $6,
+        image_url = $7
+      WHERE id = $8
       RETURNING *
       `,
-      [title, description, datetime, location, attendee_limit, category_id, id],
+      [title, description, datetime, location, attendee_limit, category_id, image_url || null, id],
     )
 
     res.status(200).json(result.rows[0])

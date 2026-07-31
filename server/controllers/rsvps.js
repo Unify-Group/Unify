@@ -6,6 +6,24 @@ const createRsvp = async (req, res) => {
   const userId = req.user?.id
 
   try {
+    const eventResult = await pool.query('SELECT organizer_id FROM events WHERE id = $1', [eventId])
+
+    if (eventResult.rows.length === 0) {
+      return handleError(
+        res,
+        { status: 404, code: 'NOT_FOUND', message: 'Event not found' },
+        'Event not found',
+      )
+    }
+
+    if (Number(eventResult.rows[0].organizer_id) === Number(userId)) {
+      return handleError(
+        res,
+        { status: 403, code: 'RSVP_FORBIDDEN', message: 'You cannot RSVP to an event you created' },
+        'You cannot RSVP to an event you created',
+      )
+    }
+
     const result = await pool.query(
       `
       INSERT INTO rsvps (user_id, event_id, status)

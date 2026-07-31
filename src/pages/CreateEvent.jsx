@@ -1,5 +1,6 @@
 import { createEvent, getCategories } from '../utils/apiHelpers.js'
 import { useState, useEffect } from 'react'
+import { resizeImageFile } from '../utils/imageUpload.js'
 
 const getCurrentMinDateTime = () => {
   const now = new Date()
@@ -22,6 +23,8 @@ export const CreateEvent = () => {
     location: '',
     attendee_limit: '',
     category: '',
+    image_url: '',
+    image_file_name: '',
   })
 
   const [categories, setCategories] = useState([])
@@ -49,6 +52,36 @@ export const CreateEvent = () => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleImageFileChange = (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    setError('')
+
+    resizeImageFile(file)
+      .then((imageDataUrl) => {
+        setFormData((current) => ({
+          ...current,
+          image_url: imageDataUrl,
+          image_file_name: file.name,
+        }))
+      })
+      .catch((err) => {
+        setError(err.message)
+      })
+  }
+
+  const handleRemoveImage = () => {
+    setFormData((current) => ({
+      ...current,
+      image_url: '',
+      image_file_name: '',
+    }))
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
@@ -62,6 +95,18 @@ export const CreateEvent = () => {
         location: formData.location,
         attendee_limit: formData.attendee_limit ? Number(formData.attendee_limit) : null,
         category_id: formData.category || null,
+        image_url: formData.image_url || null,
+      })
+
+      setFormData({
+        title: '',
+        description: '',
+        datetime: '',
+        location: '',
+        attendee_limit: '',
+        category: '',
+        image_url: '',
+        image_file_name: '',
       })
     } catch (err) {
       setError(err.message)
@@ -143,6 +188,49 @@ export const CreateEvent = () => {
           placeholder='Enter location'
           required
         />
+
+        <label>Event Image (optional)</label>
+        <div className='event-image-upload'>
+          <div className='event-image-upload-preview'>
+            {formData.image_url ? (
+              <img src={formData.image_url} alt='Event preview' />
+            ) : (
+              <span>No image selected</span>
+            )}
+          </div>
+
+          <div className='event-image-upload-controls'>
+            <label htmlFor='event_image_file' className='event-upload-btn'>
+              {formData.image_url ? 'Choose New Image' : 'Upload Image'}
+            </label>
+
+            {formData.image_url && (
+              <button type='button' className='event-remove-image-btn' onClick={handleRemoveImage}>
+                Remove Image
+              </button>
+            )}
+
+            <input
+              id='event_image_file'
+              name='event_image_file'
+              type='file'
+              accept='image/*'
+              onChange={handleImageFileChange}
+            />
+
+            <p className='event-upload-note'>Choose an image from your phone or computer.</p>
+            {formData.image_file_name && <p className='event-upload-name'>{formData.image_file_name}</p>}
+
+            <label htmlFor='image_url'>Or paste an image URL</label>
+            <input
+              id='image_url'
+              name='image_url'
+              value={formData.image_url}
+              onChange={handleChange}
+              placeholder='https://example.com/event-image.jpg'
+            />
+          </div>
+        </div>
 
         <label htmlFor='description'>Description</label>
         <textarea

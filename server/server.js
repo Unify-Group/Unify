@@ -6,6 +6,7 @@ import eventRoutes from './routes/events.js'
 import userRoutes from './routes/users.js'
 import authRoutes from './routes/auth.js'
 import rsvpRoutes from './routes/rsvps.js'
+import { pool } from './config/db.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -23,6 +24,16 @@ app.get('/', (req, res) => {
   res.status(200).send(`<h1 style="text-align: center; margin-top: 3rem;">🤝 Unify API</h1>`)
 })
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+const ensureSchema = async () => {
+  try {
+    await pool.query('ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS image_url TEXT')
+  } catch (error) {
+    console.error('Failed to ensure optional schema columns:', error)
+  }
+}
+
+ensureSchema().finally(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`)
+  })
 })

@@ -166,6 +166,7 @@ const createEventsTable = async () => {
             datetime TIMESTAMPTZ NOT NULL,
             location VARCHAR(255) NOT NULL,
             description TEXT NOT NULL,
+          image_url TEXT,
             attendee_limit INT CHECK (attendee_limit > 0),
             organizer_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             category_id INT REFERENCES categories(id) ON DELETE SET NULL,
@@ -183,8 +184,8 @@ const createEventsTable = async () => {
 
 const seedEventsTable = async () => {
   const insertQuery = `
-        INSERT INTO events (title, datetime, location, description, attendee_limit, organizer_id, category_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+  INSERT INTO events (title, datetime, location, description, image_url, attendee_limit, organizer_id, category_id)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `
 
   try {
@@ -195,6 +196,7 @@ const seedEventsTable = async () => {
           event.datetime,
           event.location,
           event.description,
+          event.image_url,
           event.attendee_limit,
           event.organizer_id,
           event.category_id,
