@@ -32,6 +32,14 @@ export const exchangeGitHubCode = async (code) => {
   return toJsonOrThrow(apiClient.post('/api/auth/github/callback', { code }))
 }
 
+export const getGoogleAuthUrl = async () => {
+  return toJsonOrThrow(apiClient.get('/api/auth/google/auth-url'))
+}
+
+export const exchangeGoogleCode = async (code) => {
+  return toJsonOrThrow(apiClient.post('/api/auth/google/callback', { code }))
+}
+
 export const signup = async ({ first_name, last_name, email, password }) => {
   return toJsonOrThrow(
     apiClient.post('/api/auth/signup', {

@@ -45,7 +45,7 @@ export const getGitHubAuthUrl = (req, res) => {
     return res.status(500).json({ error: 'GitHub OAuth not configured' })
   }
 
-  const state = Buffer.from(Math.random().toString()).toString('base64')
+  const state = Buffer.from(JSON.stringify({ provider: 'github', nonce: Math.random().toString() })).toString('base64')
   const scope = 'user:email'
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`
 
@@ -92,18 +92,33 @@ export const handleGitHubCallback = async (req, res) => {
       }
     )
 
-    console.log('[GitHub Auth] Token response:', {
+    console.log('[GitHub Auth] Token response status:', tokenResponse.status)
+    console.log('[GitHub Auth] Token response data:', {
       hasError: !!tokenResponse.data.error,
       error: tokenResponse.data.error,
+      error_description: tokenResponse.data.error_description,
       hasToken: !!tokenResponse.data.access_token,
+      tokenType: tokenResponse.data.token_type,
+      scope: tokenResponse.data.scope,
     })
 
     if (tokenResponse.data.error) {
-      console.error('[GitHub Auth] GitHub API error:', tokenResponse.data)
+      console.error('[GitHub Auth] GitHub API error response:', tokenResponse.data)
       throwHttpError(400, `GitHub API error: ${tokenResponse.data.error_description || tokenResponse.data.error}`)
     }
 
+    if (!tokenResponse.data.access_token) {
+      console.error('[GitHub Auth] No access token in response:', tokenResponse.data)
+      throwHttpError(400, 'No access token received from GitHub')
+    }
+
     const accessToken = tokenResponse.data.access_token
+
+    console.log('[GitHub Auth] Got access token:', {
+      hasToken: !!accessToken,
+      tokenLength: accessToken?.length,
+      tokenPrefix: accessToken?.substring(0, 10),
+    })
 
     console.log('[GitHub Auth] Fetching user data from GitHub API...')
     const userResponse = await axios.get('https://api.github.com/user', {
@@ -245,10 +260,28 @@ export const handleGitHubCallback = async (req, res) => {
       status: err.status,
       code: err.code,
       details: err.details,
+      axiosStatus: err.response?.status,
+      axiosData: err.response?.data,
     })
 
     if (err.status) {
       throw err
+    }
+
+    if (err.response) {
+      console.error('[GitHub Auth] GitHub API rejected request:', {
+        status: err.response.status,
+        statusText: err.response.statusText,
+        data: err.response.data,
+      })
+      throwHttpError(
+        err.response.status,
+        `GitHub authentication failed: ${err.response.data?.message || err.response.statusText}`,
+        'GITHUB_API_ERROR',
+        {
+          githubError: err.response.data,
+        }
+      )
     }
 
     console.error('[GitHub Auth] Unexpected error:', err)

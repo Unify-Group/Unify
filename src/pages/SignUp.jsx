@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { saveSession, signup, getGitHubAuthUrl, exchangeGitHubCode } from '../utils/authClient'
+import { saveSession, signup, getGitHubAuthUrl, exchangeGitHubCode, getGoogleAuthUrl, exchangeGoogleCode } from '../utils/authClient'
 
 export const SignUp = () => {
   const navigate = useNavigate()
@@ -16,32 +16,54 @@ export const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   useEffect(() => {
-    const handleGitHubCallback = async () => {
+    const handleOAuthCallback = async () => {
       const code = searchParams.get('code')
-      const error = searchParams.get('error')
+      const state = searchParams.get('state')
+      const oauthError = searchParams.get('error')
 
-      if (error) {
-        setError(`GitHub authentication failed: ${error}`)
+      if (oauthError) {
+        setError(`Authentication failed: ${oauthError}`)
         return
       }
 
-      if (code) {
-        setGithubLoading(true)
-        try {
+      if (!code || !state) {
+        return
+      }
+
+      try {
+        const decodedState = JSON.parse(atob(state))
+        const provider = decodedState.provider
+
+        if (provider === 'github') {
+          setGithubLoading(true)
           const payload = await exchangeGitHubCode(code)
           saveSession(payload)
+          // Clear URL parameters before navigating
+          window.history.replaceState({}, document.title, '/signup')
           navigate('/home')
-        } catch (err) {
-          setError(err.message)
-        } finally {
-          setGithubLoading(false)
+        } else if (provider === 'google') {
+          setGoogleLoading(true)
+          const payload = await exchangeGoogleCode(code)
+          saveSession(payload)
+          // Clear URL parameters before navigating
+          window.history.replaceState({}, document.title, '/signup')
+          navigate('/home')
         }
+      } catch (err) {
+        console.error('OAuth callback error:', err)
+        setError(err.message || 'Authentication failed')
+        // Clear URL parameters even on error
+        window.history.replaceState({}, document.title, '/signup')
+      } finally {
+        setGithubLoading(false)
+        setGoogleLoading(false)
       }
     }
 
-    handleGitHubCallback()
+    handleOAuthCallback()
   }, [searchParams, navigate])
 
   const onGitHubClick = async () => {
@@ -54,6 +76,19 @@ export const SignUp = () => {
     } catch (err) {
       setError(err.message)
       setGithubLoading(false)
+    }
+  }
+
+  const onGoogleClick = async () => {
+    setGoogleLoading(true)
+    setError('')
+
+    try {
+      const { url } = await getGoogleAuthUrl()
+      window.location.href = url
+    } catch (err) {
+      setError(err.message)
+      setGoogleLoading(false)
     }
   }
 
@@ -125,9 +160,9 @@ export const SignUp = () => {
           <p>Join Unify and start connecting.</p>
         </div>
 
-        <button className='oauth-btn' type='button' disabled>
+        <button className='oauth-btn' type='button' onClick={onGoogleClick} disabled={googleLoading}>
           <span className='oauth-dot google'></span>
-          Continue with Google
+          {googleLoading ? 'Connecting...' : 'Continue with Google'}
         </button>
 
         <button className='oauth-btn' type='button' onClick={onGitHubClick} disabled={githubLoading}>
