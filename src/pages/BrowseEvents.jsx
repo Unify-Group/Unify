@@ -23,6 +23,24 @@ export const BrowseEvents = () => {
   const [dateFilter, setDateFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date_asc')
   const [showFilters, setShowFilters] = useState(false)
+  
+  // Track default values for reset functionality
+  const DEFAULT_FILTERS = {
+    category: 'all',
+    date: 'all',
+    sort: 'date_asc',
+  }
+
+  const hasActiveFilters = categoryFilter !== DEFAULT_FILTERS.category || 
+                          dateFilter !== DEFAULT_FILTERS.date || 
+                          sortBy !== DEFAULT_FILTERS.sort
+
+  const resetFilters = () => {
+    setCategoryFilter(DEFAULT_FILTERS.category)
+    setDateFilter(DEFAULT_FILTERS.date)
+    setSortBy(DEFAULT_FILTERS.sort)
+  }
+
   const [pageSize, setPageSize] = useState(() => {
     if (typeof window === 'undefined') {
       return 6
@@ -220,48 +238,74 @@ export const BrowseEvents = () => {
 
             <aside className='browse-filter-drawer' aria-label='Event filters'>
               <div className='browse-filter-head'>
-                <h3>Filters</h3>
-                <button type='button' onClick={() => setShowFilters(false)}>Close</button>
+                <div>
+                  <h3>Filters</h3>
+                  {hasActiveFilters && <span className='browse-filter-badge'>Active</span>}
+                </div>
+                <button 
+                  type='button' 
+                  className='browse-filter-close-btn'
+                  onClick={() => setShowFilters(false)}
+                >
+                  Close
+                </button>
               </div>
 
-              <label htmlFor='categoryFilter'>Category</label>
-              <select
-                id='categoryFilter'
-                value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
-              >
-                <option value='all'>All Categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+              <div className='browse-filter-group'>
+                <label htmlFor='categoryFilter'>Category</label>
+                <select
+                  id='categoryFilter'
+                  value={categoryFilter}
+                  onChange={(event) => setCategoryFilter(event.target.value)}
+                >
+                  <option value='all'>All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <label htmlFor='dateFilter'>Date</label>
-              <select
-                id='dateFilter'
-                value={dateFilter}
-                onChange={(event) => setDateFilter(event.target.value)}
-              >
-                <option value='all'>All Dates</option>
-                <option value='upcoming'>Upcoming</option>
-                <option value='today'>Today</option>
-                <option value='this_week'>This Week</option>
-                <option value='this_month'>This Month</option>
-              </select>
+              <div className='browse-filter-group'>
+                <label htmlFor='dateFilter'>Date</label>
+                <select
+                  id='dateFilter'
+                  value={dateFilter}
+                  onChange={(event) => setDateFilter(event.target.value)}
+                >
+                  <option value='all'>All Dates</option>
+                  <option value='upcoming'>Upcoming</option>
+                  <option value='today'>Today</option>
+                  <option value='this_week'>This Week</option>
+                  <option value='this_month'>This Month</option>
+                </select>
+              </div>
 
-              <label htmlFor='sortBy'>Sort By</label>
-              <select
-                id='sortBy'
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value)}
-              >
-                <option value='date_asc'>Date: Soonest</option>
-                <option value='date_desc'>Date: Latest</option>
-                <option value='going_desc'>Most Going</option>
-                <option value='title_asc'>Title: A-Z</option>
-              </select>
+              <div className='browse-filter-group'>
+                <label htmlFor='sortBy'>Sort By</label>
+                <select
+                  id='sortBy'
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                >
+                  <option value='date_asc'>Date: Soonest</option>
+                  <option value='date_desc'>Date: Latest</option>
+                  <option value='going_desc'>Most Going</option>
+                  <option value='title_asc'>Title: A-Z</option>
+                </select>
+              </div>
+
+              <div className='browse-filter-actions'>
+                <button
+                  type='button'
+                  className='browse-filter-reset-btn'
+                  onClick={resetFilters}
+                  disabled={!hasActiveFilters}
+                >
+                  ↻ Reset Filters
+                </button>
+              </div>
             </aside>
           </>
         )}
