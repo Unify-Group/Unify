@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getEventById, getMyRsvp, getEventAttendees, createRsvp, deleteRsvp } from '../utils/apiHelpers'
 import { getSavedUser } from '../utils/authClient'
@@ -13,6 +13,8 @@ export const EventDetails = () => {
   const [isRsvped, setIsRsvped] = useState(false)
   const [attendees, setAttendees] = useState([])
   const [showRsvpModal, setShowRsvpModal] = useState(false)
+  const rsvpTriggerRef = useRef(null)
+  const modalCloseRef = useRef(null)
 
   const currentUser = getSavedUser()
   const isOwnEvent = Number(currentUser?.id) === Number(event?.organizer_id)
@@ -53,15 +55,14 @@ export const EventDetails = () => {
   }, [id, currentUser])
 
   const handleOpenRsvpModal = () => {
-    if (!currentUser || isOwnEvent) {
-      return
-    }
-
+    if (!currentUser || isOwnEvent) return
     setShowRsvpModal(true)
   }
 
   const handleCloseRsvpModal = () => {
     setShowRsvpModal(false)
+    // Return focus to the button that opened the modal
+    rsvpTriggerRef.current?.focus()
   }
 
   const handleConfirmRsvp = async () => {
@@ -85,6 +86,25 @@ export const EventDetails = () => {
     setShowRsvpModal(false)
   }
 
+  // Focus the close button when modal opens
+  useEffect(() => {
+    if (showRsvpModal) modalCloseRef.current?.focus()
+  }, [showRsvpModal])
+
+  // Trap focus inside the modal
+  const handleModalKeyDown = (e) => {
+    if (e.key === 'Escape') { handleCloseRsvpModal(); return }
+    if (e.key !== 'Tab') return
+    const modal = e.currentTarget
+    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      e.preventDefault()
+      ;(e.shiftKey ? last : first).focus()
+    }
+  }
+
   const rsvpButtonLabel = !currentUser
     ? 'Sign in to RSVP'
     : isOwnEvent
@@ -102,7 +122,7 @@ export const EventDetails = () => {
 
   if (loading) {
     return (
-      <section className='event-details-page'>
+      <section className='event-details-page' aria-busy='true' aria-label='Loading event'>
         <div className='event-details-shell'>Loading event details...</div>
       </section>
     )
@@ -129,16 +149,18 @@ export const EventDetails = () => {
           <div className='event-details-sections'>
             <section className='event-details-section info'>
               <div className='event-details-card-image'>
-                {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                {event.image_url
+                  ? <img src={event.image_url} alt={event.title} />
+                  : <span aria-hidden='true' />}
               </div>
 
               <span className='event-details-heading'>
                 <h1>{event.title}</h1>
                 <div className='category'>{event.category_name}</div>
                 <div className='date-time-location'>
-                  <p>📅 {new Date(event.datetime).toLocaleDateString()}</p>
-                  <p>🕐 {new Date(event.datetime).toLocaleTimeString()}</p>
-                  <p>📍 {event.location}</p>
+                  <p><span aria-hidden='true'>📅</span> <time dateTime={event.datetime}>{new Date(event.datetime).toLocaleDateString()}</time></p>
+                  <p><span aria-hidden='true'>🕐</span> <time dateTime={event.datetime}>{new Date(event.datetime).toLocaleTimeString()}</time></p>
+                  <p><span aria-hidden='true'>📍</span> {event.location}</p>
                 </div>
               </span>
 
@@ -179,15 +201,18 @@ export const EventDetails = () => {
             <section className='event-details-section rsvp'>
               <h5 className='rsvp-heading'>RSVP</h5>
               <div className='rsvp-text'>
-                <span className={!isRsvped ? 'rsvp-icon--inactive' : ''}>{isRsvped ? '✓' : '✕'}</span>
+                <span aria-hidden='true' className={!isRsvped ? 'rsvp-icon--inactive' : ''}>{isRsvped ? '✓' : '✕'}</span>
+                <span className='sr-only'>{isRsvped ? 'Status: attending' : 'Status: not attending'}</span>
                 <h4>{isRsvped ? "You're Going!" : 'Interested in this event?'}</h4>
                 <p>{rsvpMessage}</p>
               </div>
               <button
+                ref={rsvpTriggerRef}
                 type='button'
                 className={`rsvp-button ${isRsvped ? 'is-active' : ''}`}
                 onClick={handleOpenRsvpModal}
                 disabled={!currentUser || isOwnEvent}
+                aria-pressed={isRsvped}
               >
                 {rsvpButtonLabel}
               </button>
@@ -207,7 +232,7 @@ export const EventDetails = () => {
                         alt={`${attendee.first_name} ${attendee.last_name}`}
                       />
                     ) : (
-                      <div key={attendee.id} className='attendee-avatar'></div>
+                      <div key={attendee.id} className='attendee-avatar' aria-label={`${attendee.first_name} ${attendee.last_name}`} role='img' />
                     ),
                   )}
                 </div>
@@ -218,11 +243,17 @@ export const EventDetails = () => {
       </article>
 
       {showRsvpModal && (
-        <div className='rsvp-modal-backdrop' role='dialog' aria-modal='true' onClick={handleCloseRsvpModal}>
-          <div className='rsvp-modal-card' onClick={(event) => event.stopPropagation()}>
+        <div
+          className='rsvp-modal-backdrop'
+          role='dialog'
+          aria-modal='true'
+          aria-labelledby='rsvp-modal-title'
+          onClick={handleCloseRsvpModal}
+        >
+          <div className='rsvp-modal-card' onClick={(e) => e.stopPropagation()} onKeyDown={handleModalKeyDown}>
             <div className='rsvp-modal-header'>
-              <h3>RSVP to {event.title || 'Event'}</h3>
-              <button className='rsvp-modal-close' onClick={handleCloseRsvpModal} aria-label='Close'>✕</button>
+              <h3 id='rsvp-modal-title'>RSVP to {event.title || 'Event'}</h3>
+              <button ref={modalCloseRef} className='rsvp-modal-close' onClick={handleCloseRsvpModal} aria-label='Close RSVP dialog'>✕</button>
             </div>
 
             {event.category_name && <div className='rsvp-category-pill'>{event.category_name}</div>}

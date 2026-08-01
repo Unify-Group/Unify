@@ -80,7 +80,7 @@ export const HomeDashboard = () => {
   })
 
   return (
-    <section className='dashboard-page'>
+    <section className='dashboard-page' aria-label='Home Dashboard'>
       <div className='dashboard-shell'>
         <div className='dashboard-topbar'>
           <div>
@@ -100,13 +100,17 @@ export const HomeDashboard = () => {
           </div>
         </div>
 
-        <div className='dashboard-stats'>
+        <div className='dashboard-stats' aria-label='Your stats'>
           {statCards.map((item) => (
-            <article key={item.label} className='dashboard-stat-card'>
-              <div className={`dashboard-stat-badge ${item.tone}`}>{item.value}</div>
+            <article
+              key={item.label}
+              className='dashboard-stat-card'
+              aria-label={`${item.label}: ${item.value}`}
+            >
+              <div className={`dashboard-stat-badge ${item.tone}`} aria-hidden='true'>{item.value}</div>
               <div>
                 <p>{item.label}</p>
-                <strong>{item.value}</strong>
+                <strong aria-hidden='true'>{item.value}</strong>
               </div>
             </article>
           ))}
@@ -125,7 +129,7 @@ export const HomeDashboard = () => {
               <h3>{upNextEvent?.title || 'No upcoming events yet'}</h3>
               <p>
                 {upNextEvent
-                  ? `${formatDate(upNextEvent.datetime)} · ${upNextEvent.location}`
+                  ? <><time dateTime={upNextEvent.datetime}>{formatDate(upNextEvent.datetime)}</time> · {upNextEvent.location}</>
                   : loading
                     ? 'Loading your next event...'
                     : 'Join an event to start building your schedule.'}
@@ -182,12 +186,12 @@ export const HomeDashboard = () => {
             <h2>Recent Activity</h2>
           </div>
 
-          <div className='dashboard-activity-list'>
+          <div className='dashboard-activity-list' aria-label='Recent activity' aria-live='polite'>
             {recentActivity.map((item, index) => (
               <article key={`${item.text}-${index}`} className='dashboard-activity-item'>
-                <div className='dashboard-activity-dot'></div>
+                <div className='dashboard-activity-dot' aria-hidden='true'></div>
                 <p>{item.text}</p>
-                <span>{item.relativeTime}</span>
+                <time className='dashboard-activity-time'>{item.relativeTime}</time>
               </article>
             ))}
           </div>

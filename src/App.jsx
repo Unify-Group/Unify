@@ -88,13 +88,14 @@ function App() {
 
   return (
     <div className='app'>
-      {!isAuthReady && <div className='auth-bootstrap'>Loading session...</div>}
+      <a href='#main-content' className='skip-link'>Skip to main content</a>
+      {!isAuthReady && <div className='auth-bootstrap' aria-live='polite' aria-busy='true'>Loading session...</div>}
       {isAuthReady && !hideHeader && (
         <header className='site-header'>
           <Navbar isAuthenticated={isAuthenticated} />
         </header>
       )}
-      {isAuthReady && <main className='site-main'>{routes}</main>}
+      {isAuthReady && <main id='main-content' className='site-main'>{routes}</main>}
     </div>
   )
 }
