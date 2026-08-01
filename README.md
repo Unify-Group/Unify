@@ -30,10 +30,10 @@ Database: PostgreSQL
 
 To browse and join local events, users need to create an account with their email.
 
-# Without Github & Google OAuth authentication
+##### Without Github & Google OAuth authentication
 <img src='./planning/Gif Pics/User Registration (Without GithubGoogle OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-# With Github & Google OAuth authentication
+##### With Github & Google OAuth authentication
 <img src='./planning/Gif Pics/Github Google Auth Login & SignUp.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event creation
