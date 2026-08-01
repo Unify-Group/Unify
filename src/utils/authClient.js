@@ -24,6 +24,14 @@ const handleStaleSession = (error) => {
   throw new Error(message)
 }
 
+export const getGitHubAuthUrl = async () => {
+  return toJsonOrThrow(apiClient.get('/api/auth/github/auth-url'))
+}
+
+export const exchangeGitHubCode = async (code) => {
+  return toJsonOrThrow(apiClient.post('/api/auth/github/callback', { code }))
+}
+
 export const signup = async ({ first_name, last_name, email, password }) => {
   return toJsonOrThrow(
     apiClient.post('/api/auth/signup', {

@@ -1,9 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { saveSession, signup } from '../utils/authClient'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { saveSession, signup, getGitHubAuthUrl, exchangeGitHubCode } from '../utils/authClient'
 
 export const SignUp = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -14,6 +15,47 @@ export const SignUp = () => {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [githubLoading, setGithubLoading] = useState(false)
+
+  useEffect(() => {
+    const handleGitHubCallback = async () => {
+      const code = searchParams.get('code')
+      const error = searchParams.get('error')
+
+      if (error) {
+        setError(`GitHub authentication failed: ${error}`)
+        return
+      }
+
+      if (code) {
+        setGithubLoading(true)
+        try {
+          const payload = await exchangeGitHubCode(code)
+          saveSession(payload)
+          navigate('/home')
+        } catch (err) {
+          setError(err.message)
+        } finally {
+          setGithubLoading(false)
+        }
+      }
+    }
+
+    handleGitHubCallback()
+  }, [searchParams, navigate])
+
+  const onGitHubClick = async () => {
+    setGithubLoading(true)
+    setError('')
+
+    try {
+      const { url } = await getGitHubAuthUrl()
+      window.location.href = url
+    } catch (err) {
+      setError(err.message)
+      setGithubLoading(false)
+    }
+  }
 
   const onChange = (event) => {
     const { name, value } = event.target
@@ -88,9 +130,9 @@ export const SignUp = () => {
           Continue with Google
         </button>
 
-        <button className='oauth-btn' type='button' disabled>
+        <button className='oauth-btn' type='button' onClick={onGitHubClick} disabled={githubLoading}>
           <span className='oauth-dot github'></span>
-          Continue with GitHub
+          {githubLoading ? 'Connecting...' : 'Continue with GitHub'}
         </button>
 
         <div className='auth-divider'>
