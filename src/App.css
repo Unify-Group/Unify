@@ -2238,6 +2238,29 @@ button,
   cursor: pointer;
 }
 
+/* ─── Hamburger / Mobile Nav ─── */
+
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-mobile-menu {
+  display: none;
+}
+
+/* ─── Responsive: Tablet (≤ 920px) ─── */
+
 @media (max-width: 920px) {
   .navbar {
     min-height: auto;
@@ -2271,8 +2294,58 @@ button,
     justify-content: space-between;
   }
 
-  .dashboard-stats {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-activity-item {
+    grid-template-columns: 24px 1fr;
+  }
+
+  .dashboard-activity-item span {
+    grid-column: 2;
+  }
+
+  .dashboard-upnext-card {
     grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .hero-art {
+    min-height: 240px;
+  }
+
+  .section {
+    padding: 1.5rem 1rem;
+  }
+
+  .event-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .browse-shell {
+    padding: 1rem;
+  }
+
+  .browse-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .browse-card {
+    grid-template-columns: 80px 1fr auto;
+  }
+
+  .auth-topbar {
+    padding: 0 1rem;
+  }
+
+  .auth-card {
+    margin: 1.5rem auto;
+    padding: 1.1rem;
+  }
+
+  .auth-card-head h1 {
+    font-size: 1.65rem;
   }
 
   .profile-hero {
@@ -2320,12 +2393,13 @@ button,
   }
 
   .public-profile-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 100%;
     gap: 0.7rem;
   }
 
   .public-profile-event-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .profile-edit-grid {
@@ -2377,43 +2451,102 @@ button,
     flex-direction: column;
   }
 
-  .dashboard-upnext-card {
+  .event-details-sections {
+    flex-direction: column;
+  }
+
+  .event-details-section.info,
+  .event-details-section.rsvp {
+    width: 100%;
+  }
+
+  .event-attendees-page {
+    padding: 1rem;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ─── Responsive: Mobile (≤ 640px) ─── */
+
+@media (max-width: 640px) {
+  /* Navbar — switch to hamburger */
+  .nav-hamburger {
+    display: inline-flex;
+  }
+
+  .nav-links,
+  .nav-actions {
+    display: none;
+  }
+
+  .nav-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem 1.5rem;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.1);
+  }
+
+  .nav-mobile-menu .nav-link {
+    padding: 0.7rem 0;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-mobile-menu .create-event-btn {
+    margin-top: 0.5rem;
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .nav-mobile-menu .nav-logout {
+    text-align: left;
+    padding: 0.5rem 0;
+  }
+
+  .navbar {
+    position: relative;
+    flex-wrap: nowrap;
+    padding: 0.75rem 1rem;
+    min-height: 60px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Dashboard */
+  .dashboard-stats {
     grid-template-columns: 1fr;
-    align-items: flex-start;
   }
 
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
-  .dashboard-activity-item {
-    grid-template-columns: 24px 1fr;
+  .dashboard-upnext-copy h3 {
+    font-size: 1.3rem;
   }
 
-  .dashboard-activity-item span {
-    grid-column: 2;
+  .dashboard-outline-btn {
+    min-width: unset;
+    width: 100%;
+    margin-top: 0.75rem;
   }
 
-  .hero-art {
-    min-height: 240px;
+  .dashboard-section-header h2 {
+    font-size: 1.3rem;
   }
 
-  .section {
-    padding: 1.5rem 1rem;
-  }
-
-  .event-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .browse-shell {
-    padding: 1rem;
-  }
-
-  .browse-toolbar {
-    grid-template-columns: 1fr;
-  }
-
+  /* Browse */
   .browse-card {
     grid-template-columns: 1fr;
     align-items: flex-start;
@@ -2424,16 +2557,137 @@ button,
     height: 160px;
   }
 
-  .auth-topbar {
-    padding: 0 1rem;
+  .browse-filter-drawer {
+    width: 100vw;
+    left: 0;
   }
 
+  /* Hero */
+  .hero-copy h1 {
+    font-size: clamp(1.6rem, 7vw, 2.4rem);
+  }
+
+  .hero-art {
+    min-height: 180px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  /* Event grid */
+  .event-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Public profile */
+  .public-profile-stats {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+
+  .public-profile-event-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-profile-copy h1 {
+    font-size: 1.3rem;
+  }
+
+  .public-profile-avatar {
+    width: 72px;
+    height: 72px;
+  }
+
+  /* Profile */
+  .profile-attending-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-hero-main {
+    gap: 0.75rem;
+  }
+
+  /* Event details */
+  .event-details-page {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .event-details-heading .category {
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  /* Event attendees */
+  .event-attendees-page {
+    padding: 1rem;
+  }
+
+  /* Auth */
   .auth-card {
-    margin: 1.5rem auto;
+    margin: 1rem auto;
+    width: 95vw;
+  }
+
+  /* Modals */
+  .rsvp-modal-card {
     padding: 1.1rem;
   }
 
+  .rsvp-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .rsvp-modal-secondary,
+  .rsvp-modal-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Forms */
+  .event-form-actions {
+    flex-direction: column;
+  }
+
+  .profile-edit-actions {
+    flex-direction: column;
+  }
+}
+
+/* ─── Responsive: Small mobile (≤ 400px) ─── */
+
+@media (max-width: 400px) {
+  .brand-text {
+    font-size: 1.15rem;
+  }
+
+  .dashboard-stat-card {
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+
+  .dashboard-stat-card strong {
+    font-size: 1.2rem;
+  }
+
   .auth-card-head h1 {
-    font-size: 1.65rem;
+    font-size: 1.4rem;
+  }
+
+  .public-profile-copy h1 {
+    font-size: 1.1rem;
+  }
+
+  .section h2,
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .event-form-head h1 {
+    font-size: 1.75rem;
   }
 }
