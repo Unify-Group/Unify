@@ -116,6 +116,10 @@ When a user login/sign up it shows a personalized homepage dashboard about their
 
 <img src='./planning/Gif Pics/Home dashboard (Personalized).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
+### Public Profile Page
+When a user want to check out another user or the person who organized this event to see if they have organized other events or their interest.
+
+<img src='./planning/Gif Pics' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ## Installation Instructions
 
