@@ -34,7 +34,7 @@ To browse and join local events, users need to create an account with their emai
 <img src='./planning/Gif Pics/User Registration (Without GithubGoogle OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ##### With Github & Google OAuth authentication
-<img src='./planning/Gif Pics/Github Google Auth Login & SignUp.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Github Google Auth Login & SignUp.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event creation
 
