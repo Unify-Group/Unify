@@ -2076,19 +2076,10 @@
   opacity: 1;
 }
 
-.oauth-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  display: inline-block;
-}
-
-.oauth-dot.google {
-  background: #facc15;
-}
-
-.oauth-dot.github {
-  background: #111111;
+.oauth-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .auth-divider {
