@@ -30,7 +30,11 @@ Database: PostgreSQL
 
 To browse and join local events, users need to create an account with their email.
 
+# Without Github & Google OAuth authentication
 <img src='./planning/Gif Pics/User Registration (Without GithubGoogle OAuth).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+
+# With Github & Google OAuth authentication
+<img src='./planning/Gif Pics/Github Google Auth Login & SignUp.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Event creation
 
@@ -48,7 +52,7 @@ Users can view a list of upcoming events to discover things happening near them.
 
 Users can filter events by category to quickly find ones that match their interests.
 
-<img src='./planning/Gif Pics/Category filtering.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Category Filtering Completed.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### Keyword search
 
@@ -119,7 +123,7 @@ When a user login/sign up it shows a personalized homepage dashboard about their
 ### Public Profile Page
 When a user want to check out another user or the person who organized this event to see if they have organized other events or their interest.
 
-<img src='./planning/Gif Pics' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Public Profile User Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ## Installation Instructions
 
