@@ -86,20 +86,20 @@ Complete the checklist below detailing each baseline, custom, and stretch featur
 
 ### 1. What went well during this unit?
 
-[👉🏾👉🏾👉🏾 your answer here]
+We were able to successfully deploy our project and complete all of the required features. We also finished ahead of schedule, which gave us additional time to implement several stretch features and further improve the overall user experience.
 
 ### 2. What were some challenges your group faced in this unit?
 
-[👉🏾👉🏾👉🏾 your answer here]
+Deployment was one of the biggest challenges we faced. Our authentication system worked correctly in development but encountered issues after deployment. We spent time troubleshooting the problem, and after making the necessary fixes, we were able to get the authentication system working properly in production.
 
 ### 3. What were some of the highlights or achievements that you are most proud of in this project?
 
-[👉🏾👉🏾👉🏾 your answer here]
+One of our biggest achievements was working together as a team to build a polished, fully functional full-stack web application. Seeing our project come together from the planning stage to a finished product that users can interact with was very rewarding.
 
 ### 4. Reflecting on your web development journey so far, how have you grown since the beginning of the course?
 
-[👉🏾👉🏾👉🏾 your answer here]
+Throughout this course, we grew both individually and as a team. We gained experience designing databases, building RESTful APIs, developing React frontends, implementing authentication, and deploying a full-stack application. Completing this project gave us a much better understanding of the full development process and what it takes to build a production-ready web application.
 
 ### 5. Looking ahead, what are your goals related to web development, and what steps do you plan to take to achieve them?
 
-[👉🏾👉🏾👉🏾 your answer here]
+Moving forward, we want to continue strengthening our full-stack development skills by building more projects, participating in hackathons and competitions, and exploring freelance opportunities. We also hope to apply the knowledge and experience we gained from this course in future internships and full-time software engineering roles.
