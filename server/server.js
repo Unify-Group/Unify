@@ -24,6 +24,10 @@ app.get('/', (req, res) => {
   res.status(200).send(`<h1 style="text-align: center; margin-top: 3rem;">🤝 Unify API</h1>`)
 })
 
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok' })
+})
+
 const ensureSchema = async () => {
   try {
     await pool.query('ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS image_url TEXT')

@@ -200,3 +200,11 @@ This starts:
 ```bash
 npm run build
 ```
+
+## Deploy on Render
+
+This repo includes a Render blueprint at [render.yaml](render.yaml) for deploying both services:
+- Backend API (`unify-api`)
+- Frontend static site (`unify-web`)
+
+Full step-by-step instructions are in [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md).
