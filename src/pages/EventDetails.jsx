@@ -4,6 +4,7 @@ import { getEventById, getMyRsvp, getEventAttendees, createRsvp, deleteRsvp } fr
 import { getSavedUser } from '../utils/authClient'
 import { Spinner } from '../components/Spinner'
 import { useToast } from '../components/ToastProvider'
+import { resolveEventImage } from '../utils/eventImages.js'
 
 const toSafeDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -182,9 +183,7 @@ export const EventDetails = () => {
           <div className='event-details-sections'>
             <section className='event-details-section info'>
               <div className='event-details-card-image'>
-                {event.image_url
-                  ? <img src={event.image_url} alt={event.title} />
-                  : <span aria-hidden='true' />}
+                <img src={resolveEventImage(event, Number(id) || 0)} alt={event.title} />
               </div>
 
               <span className='event-details-heading'>

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getPublicUserProfile } from '../utils/apiHelpers'
 import { Spinner } from '../components/Spinner'
 import { useToast } from '../components/ToastProvider'
+import { resolveEventImage } from '../utils/eventImages.js'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -181,7 +182,7 @@ export const PublicProfile = () => {
                 className='public-profile-event-card'
               >
                 <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
-                  {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                  <img src={resolveEventImage(event, index)} alt={event.title} />
                 </div>
                 <h3>{event.title}</h3>
                 <p>{formatDate(event.datetime)}</p>

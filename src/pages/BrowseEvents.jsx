@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Spinner } from '../components/Spinner'
 import { useToast } from '../components/ToastProvider'
+import { resolveEventImage } from '../utils/eventImages.js'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -360,7 +361,7 @@ export const BrowseEvents = () => {
                 aria-label={`View details for ${event.title}`}
               >
                 <div className='browse-card-image'>
-                  {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                  <img src={resolveEventImage(event, event.id)} alt={event.title} />
                 </div>
                 <div className='browse-card-content'>
                   <h3>{event.title}</h3>

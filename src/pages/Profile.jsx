@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { clearSession, deleteCurrentUserAccount, fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
 import { formatRelativeTime, parseInterestList } from '../utils/profileUtils'
 import { useToast } from '../components/ToastProvider'
+import { resolveEventImage } from '../utils/eventImages.js'
 
 const IDENTITY_OPTIONS = [
   'Community Member',
@@ -548,7 +549,7 @@ export const Profile = () => {
                     className='profile-attending-card'
                   >
                     <div className={`event-image ${index % 2 === 0 ? 'orange' : 'indigo'}`}>
-                      {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                      <img src={resolveEventImage(event, index)} alt={event.title} />
                     </div>
                     <h3>
                       {event.title} <span> - {formatShortDate(event.datetime)}</span>
@@ -582,7 +583,7 @@ export const Profile = () => {
                     className='profile-attending-card'
                   >
                     <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
-                      {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                      <img src={resolveEventImage(event, index)} alt={event.title} />
                     </div>
                     <h3>
                       {event.title} <span> - {formatShortDate(event.datetime)}</span>

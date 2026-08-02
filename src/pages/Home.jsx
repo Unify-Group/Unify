@@ -1,6 +1,7 @@
 import { getCategories, getEvents } from '../utils/apiHelpers.js'
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { getLandingSlideshowImages, resolveEventImage } from '../utils/eventImages.js'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -25,8 +26,10 @@ const formatDate = (dateValue) => {
 export const Home = ({ isAuthenticated }) => {
   const [categories, setCategories] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
   const eventsPath = isAuthenticated ? '/events' : '/login'
   const createEventPath = isAuthenticated ? '/events/create' : '/login'
+  const heroImages = useMemo(() => getLandingSlideshowImages(upcomingEvents), [upcomingEvents])
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -53,6 +56,19 @@ export const Home = ({ isAuthenticated }) => {
 
     loadUpcomingEvents()
   }, [])
+
+  useEffect(() => {
+    if (heroImages.length <= 1) {
+      return undefined
+    }
+
+    const slideTimer = window.setInterval(() => {
+      setHeroSlideIndex((current) => (current + 1) % heroImages.length)
+    }, 4500)
+
+    return () => window.clearInterval(slideTimer)
+  }, [heroImages])
+
   return (
     <>
       <section className='hero'>
@@ -69,7 +85,17 @@ export const Home = ({ isAuthenticated }) => {
           </div>
         </div>
 
-        <div className='hero-art' aria-hidden='true'></div>
+        <div className='hero-art hero-carousel' aria-label='Event photo highlights'>
+          {heroImages.map((image, index) => (
+            <img
+              key={image}
+              src={image}
+              alt='Community event highlight'
+              className={`hero-carousel-image ${index === heroSlideIndex ? 'is-active' : ''}`}
+              loading={index === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
+        </div>
       </section>
 
       <section id='upcoming-events' className='section'>
@@ -81,7 +107,9 @@ export const Home = ({ isAuthenticated }) => {
         <div className='event-grid'>
           {upcomingEvents.map((event) => (
             <article key={event.id} className='event-card'>
-              <div className='event-image indigo'></div>
+              <div className='event-image indigo'>
+                <img src={resolveEventImage(event, event.id, { preferTitleMatch: true })} alt={event.title} />
+              </div>
               <h3>{event.title}</h3>
               <p>{formatDate(event.datetime)}</p>
               <p>{event.location}</p>

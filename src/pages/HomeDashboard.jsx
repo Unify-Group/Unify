@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchDashboardData, getSavedUser } from '../utils/authClient'
 import { buildRecentActivity, parseInterestList } from '../utils/profileUtils'
+import { resolveEventImage } from '../utils/eventImages.js'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -116,7 +117,7 @@ export const HomeDashboard = () => {
 
           <article className='dashboard-upnext-card'>
             <div className='dashboard-upnext-art'>
-              {upNextEvent?.image_url ? <img src={upNextEvent.image_url} alt={upNextEvent.title} /> : null}
+              {upNextEvent ? <img src={resolveEventImage(upNextEvent, upNextEvent.id)} alt={upNextEvent.title} /> : null}
             </div>
             <div className='dashboard-upnext-copy'>
               <h3>{upNextEvent?.title || 'No upcoming events yet'}</h3>
@@ -160,7 +161,7 @@ export const HomeDashboard = () => {
                 className='dashboard-event-card'
               >
                 <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
-                  {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                  <img src={resolveEventImage(event, index)} alt={event.title} />
                 </div>
                 <h3>{event.title}</h3>
                 <p>{formatDate(event.datetime)}</p>
