@@ -39,10 +39,11 @@ services:
       - key: GOOGLE_REDIRECT_URI
         sync: false
 
-staticSites:
-  - name: unify-web
+  - type: static_site
+    name: unify-web
     buildCommand: npm install && npm run build
     publishPath: dist
+    autoDeploy: true
     pullRequestPreviewsEnabled: true
     envVars:
       - key: VITE_API_BASE_URL
