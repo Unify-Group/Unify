@@ -41,7 +41,7 @@ services:
 
   - type: web
     name: unify-web
-    env: static
+    runtime: static
     buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: dist
     routes:
