@@ -19,6 +19,7 @@ function App() {
   const location = useLocation()
   const [isAuthReady, setIsAuthReady] = useState(false)
   const isAuthenticated = Boolean(getSavedToken())
+  const hasOAuthCallback = new URLSearchParams(location.search).has('code') && new URLSearchParams(location.search).has('state')
   const hideHeader = location.pathname === '/login' || location.pathname === '/signup'
 
   useEffect(() => {
@@ -90,12 +91,12 @@ function App() {
     <div className='app'>
       <a href='#main-content' className='skip-link'>Skip to main content</a>
       {!isAuthReady && <div className='auth-bootstrap' aria-live='polite' aria-busy='true'>Loading session...</div>}
-      {isAuthReady && !hideHeader && (
+      {isAuthReady && !hideHeader && !hasOAuthCallback && (
         <header className='site-header'>
           <Navbar isAuthenticated={isAuthenticated} />
         </header>
       )}
-      {isAuthReady && <main id='main-content' className='site-main'>{routes}</main>}
+      {isAuthReady && <main id='main-content' className='site-main'>{hasOAuthCallback ? <SignIn /> : routes}</main>}
     </div>
   )
 }

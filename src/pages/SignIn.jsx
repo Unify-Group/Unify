@@ -41,21 +41,21 @@ export const SignIn = () => {
           const payload = await exchangeGitHubCode(code)
           saveSession(payload)
           // Clear URL parameters before navigating
-          window.history.replaceState({}, document.title, '/login')
+          window.history.replaceState({}, document.title, '/')
           navigate('/home')
         } else if (provider === 'google') {
           setGoogleLoading(true)
           const payload = await exchangeGoogleCode(code)
           saveSession(payload)
           // Clear URL parameters before navigating
-          window.history.replaceState({}, document.title, '/login')
+          window.history.replaceState({}, document.title, '/')
           navigate('/home')
         }
       } catch (err) {
         console.error('OAuth callback error:', err)
         setError(err.message || 'Authentication failed')
         // Clear URL parameters even on error
-        window.history.replaceState({}, document.title, '/login')
+        window.history.replaceState({}, document.title, '/')
       } finally {
         setGithubLoading(false)
         setGoogleLoading(false)
