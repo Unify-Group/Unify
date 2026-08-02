@@ -44,6 +44,21 @@ const ensureSchema = async () => {
         archived_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `)
+
+    // Archived rows should survive account deletion.
+    await pool.query('ALTER TABLE events_archive DROP CONSTRAINT IF EXISTS events_archive_organizer_id_fkey')
+    await pool.query('ALTER TABLE events_archive ALTER COLUMN organizer_id DROP NOT NULL')
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS event_deletion_notices (
+        id SERIAL PRIMARY KEY,
+        recipient_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        event_id INT,
+        event_title VARCHAR(80) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
   } catch (error) {
     console.error('Failed to ensure optional schema columns:', error)
   }

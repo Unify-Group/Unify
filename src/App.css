@@ -1872,6 +1872,22 @@
   background: #fef2f2;
 }
 
+.delete-events-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.delete-events-checkbox input {
+  width: 16px;
+  height: 16px;
+  margin-top: 0.15rem;
+}
+
 .profile-section-head {
   display: flex;
   align-items: center;
@@ -1960,6 +1976,34 @@
   margin: 0.8rem 0 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.profile-notice-list {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.profile-notice-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.8rem 0.9rem;
+}
+
+.profile-notice-item p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.profile-notice-time {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .event-form-page {

@@ -23,3 +23,19 @@ test('buildRecentActivity uses real timestamps for recent activity entries', () 
   assert.equal(activity[1].relativeTime, '2h ago')
   assert.equal(activity[2].relativeTime, '1d ago')
 })
+
+test('buildRecentActivity prioritizes deleted event notices when present', () => {
+  const now = new Date('2026-07-30T12:00:00.000Z')
+
+  const activity = buildRecentActivity({
+    attendingEvents: [{ title: 'Sunset Picnic', rsvp_created_at: '2026-07-30T11:30:00.000Z' }],
+    hostedEvents: [{ title: 'Open Mic Night', created_at: '2026-07-30T10:00:00.000Z' }],
+    deletedEventNotices: [{ event_title: 'Tech Mixer', message: 'Tech Mixer has been deleted by the organizer.', created_at: '2026-07-30T11:50:00.000Z' }],
+    interests: ['music', 'art'],
+    userCreatedAt: '2026-07-29T08:00:00.000Z',
+    now,
+  })
+
+  assert.equal(activity[0].text, 'Tech Mixer has been deleted by the organizer.')
+  assert.equal(activity[0].relativeTime, '10m ago')
+})

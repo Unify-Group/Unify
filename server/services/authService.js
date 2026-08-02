@@ -1,7 +1,7 @@
 import { pool } from '../config/db.js'
 import { hashPassword, comparePassword } from '../utils/password.js'
 import { generateToken } from '../utils/jwt.js'
-import { archivePastEvents } from './archiveService.js'
+import { archiveEventsForOrganizer, archivePastEvents } from './archiveService.js'
 
 const cleanUser = (row) => ({
   id: row.id,
@@ -426,6 +426,17 @@ export const getDashboardData = async (userId) => {
       [resolvedUser.id]
     )
 
+    const deletionNoticesResult = await pool.query(
+      `
+      SELECT id, event_id, event_title, message, created_at
+      FROM event_deletion_notices
+      WHERE recipient_user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 5
+      `,
+      [resolvedUser.id],
+    )
+
     const allEventsResult = await pool.query(
       `
       SELECT
@@ -492,6 +503,7 @@ export const getDashboardData = async (userId) => {
       hostedEvents,
       pastHostedEvents,
       recommendedEvents,
+      deletionNotices: deletionNoticesResult.rows,
     }
   } catch (err) {
     if (err.status) {
@@ -502,12 +514,64 @@ export const getDashboardData = async (userId) => {
   }
 }
 
-export const deleteCurrentUserAccount = async (authUser) => {
+export const deleteCurrentUserAccount = async (authUser, options = {}) => {
+  const deleteEventsPermanently = Boolean(options?.deleteEventsPermanently)
   const client = await pool.connect()
 
   try {
     await client.query('BEGIN')
     const resolvedUser = await resolveAuthenticatedUser(authUser, client)
+
+    const hostedEventsResult = await client.query(
+      `
+      SELECT id, title
+      FROM events
+      WHERE organizer_id = $1
+      `,
+      [resolvedUser.id],
+    )
+
+    const hostedEventIds = hostedEventsResult.rows.map((row) => Number(row.id)).filter(Boolean)
+
+    if (hostedEventIds.length > 0) {
+      if (deleteEventsPermanently) {
+        const attendeeRows = await client.query(
+          `
+          SELECT
+            r.user_id,
+            r.event_id,
+            e.title
+          FROM rsvps r
+          INNER JOIN events e ON e.id = r.event_id
+          WHERE r.event_id = ANY($1::INT[])
+            AND r.status = 'attending'
+            AND r.user_id <> $2
+          `,
+          [hostedEventIds, resolvedUser.id],
+        )
+
+        for (const attendee of attendeeRows.rows) {
+          await client.query(
+            `
+            INSERT INTO event_deletion_notices (recipient_user_id, event_id, event_title, message)
+            VALUES ($1, $2, $3, $4)
+            `,
+            [
+              attendee.user_id,
+              attendee.event_id,
+              attendee.title,
+              `${attendee.title} has been deleted by the organizer.`,
+            ],
+          )
+        }
+
+        await client.query('DELETE FROM events_archive WHERE source_event_id = ANY($1::INT[])', [hostedEventIds])
+        await client.query('DELETE FROM events WHERE id = ANY($1::INT[])', [hostedEventIds])
+      } else {
+        await archiveEventsForOrganizer(resolvedUser.id, client)
+        await client.query('DELETE FROM events WHERE organizer_id = $1', [resolvedUser.id])
+      }
+    }
 
     const result = await client.query('DELETE FROM users WHERE id = $1 RETURNING id', [resolvedUser.id])
 

@@ -1,17 +1,7 @@
 import { pool } from '../config/db.js'
 
-// Mirror past events into an archive dataset so analytics/history can read from a dedicated table.
-export const archivePastEvents = async () => {
-  await pool.query(
-    `
-    UPDATE events
-    SET archived_at = NOW()
-    WHERE archived_at IS NULL
-      AND datetime < NOW()
-    `,
-  )
-
-  await pool.query(
+const archiveEventsByWhereClause = async (db, whereClause, values = []) => {
+  await db.query(
     `
     INSERT INTO events_archive (
       source_event_id,
@@ -39,7 +29,7 @@ export const archivePastEvents = async () => {
       e.created_at,
       COALESCE(e.archived_at, NOW())
     FROM events e
-    WHERE e.datetime < NOW()
+    WHERE ${whereClause}
     ON CONFLICT (source_event_id) DO UPDATE
     SET
       title = EXCLUDED.title,
@@ -53,5 +43,50 @@ export const archivePastEvents = async () => {
       created_at = EXCLUDED.created_at,
       archived_at = EXCLUDED.archived_at
     `,
+    values,
   )
+}
+
+// Mirror past events into an archive dataset so analytics/history can read from a dedicated table.
+export const archivePastEvents = async () => {
+  await pool.query(
+    `
+    UPDATE events
+    SET archived_at = NOW()
+    WHERE archived_at IS NULL
+      AND datetime < NOW()
+    `,
+  )
+
+  await archiveEventsByWhereClause(pool, 'e.datetime < NOW()')
+}
+
+export const archiveEventsForOrganizer = async (organizerId, db = pool) => {
+  await db.query(
+    `
+    UPDATE events
+    SET archived_at = COALESCE(archived_at, NOW())
+    WHERE organizer_id = $1
+    `,
+    [organizerId],
+  )
+
+  await archiveEventsByWhereClause(db, 'e.organizer_id = $1', [organizerId])
+}
+
+export const archiveEventsByIds = async (eventIds, db = pool) => {
+  if (!Array.isArray(eventIds) || eventIds.length === 0) {
+    return
+  }
+
+  await db.query(
+    `
+    UPDATE events
+    SET archived_at = COALESCE(archived_at, NOW())
+    WHERE id = ANY($1::INT[])
+    `,
+    [eventIds],
+  )
+
+  await archiveEventsByWhereClause(db, 'e.id = ANY($1::INT[])', [eventIds])
 }

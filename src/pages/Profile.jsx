@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { clearSession, deleteCurrentUserAccount, fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
-import { parseInterestList } from '../utils/profileUtils'
+import { formatRelativeTime, parseInterestList } from '../utils/profileUtils'
 
 const IDENTITY_OPTIONS = [
   'Community Member',
@@ -61,6 +61,7 @@ export const Profile = () => {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteEventsPermanently, setDeleteEventsPermanently] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     first_name: '',
@@ -112,6 +113,7 @@ export const Profile = () => {
   const pastHostedEvents = dashboard?.pastHostedEvents || []
   const attendingEvents = dashboard?.attendingEvents || []
   const pastAttendingEvents = dashboard?.pastAttendingEvents || []
+  const deletionNotices = dashboard?.deletionNotices || []
   const interests = parseInterestList(user?.profile?.interests)
   const identityLabels = String(user?.profile?.identity_labels || '')
     .split(',')
@@ -235,7 +237,7 @@ export const Profile = () => {
     setError('')
 
     try {
-      await deleteCurrentUserAccount()
+      await deleteCurrentUserAccount({ deleteEventsPermanently })
       clearSession()
       window.location.href = '/'
     } catch (err) {
@@ -442,7 +444,10 @@ export const Profile = () => {
               <button
                 type='button'
                 className='profile-danger-btn'
-                onClick={() => setShowDeleteConfirm(true)}
+                onClick={() => {
+                  setDeleteEventsPermanently(false)
+                  setShowDeleteConfirm(true)
+                }}
                 disabled={deleting}
               >
                 Delete Profile
@@ -547,6 +552,25 @@ export const Profile = () => {
                 {!pastAttendingEvents.length && <p className='profile-empty'>No past attended events yet.</p>}
               </div>
             </section>
+
+            <section className='profile-panel'>
+              <h2>Deleted Event Notices</h2>
+
+              <div className='profile-notice-list'>
+                {deletionNotices.map((notice) => (
+                  <article key={notice.id} className='profile-notice-item'>
+                    <p>{notice.message}</p>
+                    <time className='profile-notice-time'>
+                      {formatRelativeTime(notice.created_at)}
+                    </time>
+                  </article>
+                ))}
+
+                {!deletionNotices.length && (
+                  <p className='profile-empty'>No deleted event notices yet.</p>
+                )}
+              </div>
+            </section>
           </div>
         </section>
       </div>
@@ -560,8 +584,23 @@ export const Profile = () => {
             </div>
 
             <p className='rsvp-modal-text'>
-              Are you sure you want to delete your profile? if you delete your profile it will never be recovered again.
+              Are you sure you want to delete your profile? If you delete your profile, it will never be recovered again.
             </p>
+
+            <p className='rsvp-modal-text'>
+              By default, your events will be archived. If you want your events permanently deleted,
+              check the box below.
+            </p>
+
+            <label className='delete-events-checkbox'>
+              <input
+                type='checkbox'
+                checked={deleteEventsPermanently}
+                onChange={(event) => setDeleteEventsPermanently(event.target.checked)}
+                disabled={deleting}
+              />
+              If you want your events to be deleted, click this checkbox.
+            </label>
 
             <div className='rsvp-modal-actions'>
               <button type='button' className='rsvp-modal-secondary' onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>

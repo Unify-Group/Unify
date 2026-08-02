@@ -40,8 +40,15 @@ export const formatRelativeTime = (dateValue, now = new Date()) => {
   return `${Math.max(1, Math.floor(diffDays / 7))}w ago`
 }
 
-export const buildRecentActivity = ({ attendingEvents = [], hostedEvents = [], interests = [], userCreatedAt = null, now = new Date() }) => {
+export const buildRecentActivity = ({ attendingEvents = [], hostedEvents = [], deletedEventNotices = [], interests = [], userCreatedAt = null, now = new Date() }) => {
   const activityItems = []
+
+  if (deletedEventNotices[0]) {
+    activityItems.push({
+      text: deletedEventNotices[0].message || `${deletedEventNotices[0].event_title || 'An event'} has been deleted.`,
+      timestamp: deletedEventNotices[0].created_at || now.toISOString(),
+    })
+  }
 
   if (attendingEvents[0]) {
     activityItems.push({

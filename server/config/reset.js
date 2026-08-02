@@ -196,7 +196,7 @@ const createEventsArchiveTable = async () => {
             description TEXT NOT NULL,
             image_url TEXT,
             attendee_limit INT CHECK (attendee_limit > 0),
-            organizer_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          organizer_id INT,
             category_id INT REFERENCES categories(id) ON DELETE SET NULL,
             created_at TIMESTAMPTZ NOT NULL,
             archived_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -208,6 +208,29 @@ const createEventsArchiveTable = async () => {
     console.log('✅ events_archive table created successfully')
   } catch (err) {
     console.error('❌ error creating events_archive table:', err)
+    throw err
+  }
+}
+
+const createEventDeletionNoticesTable = async () => {
+  const createTableQuery = `
+        DROP TABLE IF EXISTS event_deletion_notices CASCADE;
+
+        CREATE TABLE event_deletion_notices (
+            id SERIAL PRIMARY KEY,
+            recipient_user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            event_id INT,
+            event_title VARCHAR(80) NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    `
+
+  try {
+    await pool.query(createTableQuery)
+    console.log('✅ event_deletion_notices table created successfully')
+  } catch (err) {
+    console.error('❌ error creating event_deletion_notices table:', err)
     throw err
   }
 }
@@ -285,6 +308,7 @@ const resetDb = async () => {
     await createCategoriesTable()
     await createEventsTable()
     await createEventsArchiveTable()
+    await createEventDeletionNoticesTable()
     await createRsvpsTable()
     await seedUsersTable()
     await seedProfilesTable()

@@ -198,6 +198,37 @@ const deleteEvent = async (req, res) => {
       return res.status(access.error.status).json({ error: access.error.message })
     }
 
+    const eventResult = await pool.query('SELECT id, title FROM events WHERE id = $1', [id])
+
+    if (eventResult.rows.length > 0) {
+      const attendeeRows = await pool.query(
+        `
+        SELECT user_id
+        FROM rsvps
+        WHERE event_id = $1
+          AND status = 'attending'
+          AND user_id <> $2
+        `,
+        [id, organizerId],
+      )
+
+      for (const attendee of attendeeRows.rows) {
+        await pool.query(
+          `
+          INSERT INTO event_deletion_notices (recipient_user_id, event_id, event_title, message)
+          VALUES ($1, $2, $3, $4)
+          `,
+          [
+            attendee.user_id,
+            id,
+            eventResult.rows[0].title,
+            `${eventResult.rows[0].title} has been deleted by the organizer.`,
+          ],
+        )
+      }
+    }
+
+    await pool.query('DELETE FROM events_archive WHERE source_event_id = $1', [id])
     await pool.query('DELETE FROM events WHERE id = $1', [id])
     res.status(204).send()
   } catch (err) {

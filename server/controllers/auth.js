@@ -55,7 +55,9 @@ export const updateMe = async (req, res) => {
 
 export const deleteMe = async (req, res) => {
   try {
-    const result = await deleteCurrentUserAccount(req.user)
+    const result = await deleteCurrentUserAccount(req.user, {
+      deleteEventsPermanently: req.body?.deleteEventsPermanently,
+    })
     return res.status(200).json(result)
   } catch (err) {
     return handleError(res, err, 'Failed to delete account')

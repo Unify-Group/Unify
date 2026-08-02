@@ -78,6 +78,7 @@ export const HomeDashboard = () => {
   const recentActivity = buildRecentActivity({
     attendingEvents,
     hostedEvents,
+    deletedEventNotices: dashboard?.deletionNotices || [],
     interests,
     userCreatedAt: user?.created_at || null,
   })

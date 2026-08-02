@@ -142,7 +142,7 @@ export const updateCurrentUserProfile = async (profileData) => {
   return payload.user
 }
 
-export const deleteCurrentUserAccount = async () => {
+export const deleteCurrentUserAccount = async ({ deleteEventsPermanently = false } = {}) => {
   const token = getSavedToken()
 
   if (!token) {
@@ -154,6 +154,9 @@ export const deleteCurrentUserAccount = async () => {
       apiClient.delete('/api/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+        data: {
+          deleteEventsPermanently,
         },
       }),
     )
