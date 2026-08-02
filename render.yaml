@@ -42,7 +42,6 @@ services:
   - type: web
     name: unify-web
     env: static
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     autoDeploy: true
