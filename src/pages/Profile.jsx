@@ -560,7 +560,7 @@ export const Profile = () => {
             </div>
 
             <p className='rsvp-modal-text'>
-              Are you sure u want to delete your profile? if you delete your profile it will never be recovered again.
+              Are you sure you want to delete your profile? if you delete your profile it will never be recovered again.
             </p>
 
             <div className='rsvp-modal-actions'>
