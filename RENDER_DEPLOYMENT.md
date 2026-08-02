@@ -52,20 +52,23 @@ So your frontend variable should be:
 After Render gives you frontend URL, update OAuth apps to match:
 
 GitHub OAuth App:
-- Authorization callback URL: https://unify-web.onrender.com/
+- Authorization callback URL: https://unify-web.onrender.com/login.html
 
 Google OAuth Client:
-- Authorized redirect URI: https://unify-web.onrender.com/
+- Authorized redirect URI: https://unify-web.onrender.com/login.html
 
 Then set matching values in API env vars:
-- GITHUB_REDIRECT_URI=https://unify-web.onrender.com/
-- GOOGLE_REDIRECT_URI=https://unify-web.onrender.com/
+- GITHUB_REDIRECT_URI=https://unify-web.onrender.com/login.html
+- GOOGLE_REDIRECT_URI=https://unify-web.onrender.com/login.html
 
 ## 6. Deploy order
 1. Deploy API service first.
 2. Copy API URL.
 3. Set VITE_API_BASE_URL on static site.
 4. Redeploy static site.
+5. If the OAuth callback still returns 404, clear the Render build cache and redeploy the static site again.
+
+The frontend includes a real static callback file at [public/login](public/login), so the deployed site must build a fresh version to publish it as `/login`.
 
 ## 7. Verify deployment
 - API health: https://<your-api-service>.onrender.com/healthz
@@ -77,9 +80,9 @@ Then set matching values in API env vars:
 
 ## 8. Troubleshooting
 - If login/OAuth fails:
-  - Confirm OAuth callback URIs exactly match your frontend root URL.
+  - Confirm OAuth callback URIs exactly match `https://unify-web.onrender.com/login.html`.
   - Confirm frontend VITE_API_BASE_URL points to the API service.
-  - If you see `redirect_uri_mismatch`, the OAuth app settings in GitHub/Google do not exactly match `https://unify-web.onrender.com/`.
+  - If you see `redirect_uri_mismatch`, the OAuth app settings in GitHub/Google do not exactly match `https://unify-web.onrender.com/login.html`.
 - If API cannot connect DB:
   - Recheck PG* env values.
 - If frontend calls localhost in production:
