@@ -39,10 +39,12 @@ services:
       - key: GOOGLE_REDIRECT_URI
         sync: false
 
-  - type: static
+  - type: web
     name: unify-web
+    env: static
+    plan: free
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     autoDeploy: true
     pullRequestPreviewsEnabled: true
     envVars:
