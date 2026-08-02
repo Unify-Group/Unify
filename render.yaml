@@ -46,8 +46,29 @@ services:
     staticPublishPath: dist
     routes:
       - type: rewrite
+        source: /login
+        destination: /
+      - type: rewrite
+        source: /signup
+        destination: /
+      - type: rewrite
+        source: /home
+        destination: /
+      - type: rewrite
+        source: /events
+        destination: /
+      - type: rewrite
+        source: /profile
+        destination: /
+      - type: rewrite
+        source: /users/*
+        destination: /
+      - type: rewrite
+        source: /events/*
+        destination: /
+      - type: rewrite
         source: /*
-        destination: /index.html
+        destination: /
     autoDeploy: true
     pullRequestPreviewsEnabled: true
     envVars:
