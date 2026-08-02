@@ -25,6 +25,8 @@ export const EventDetails = () => {
   const isOwnEvent = Number(currentUser?.id) === Number(event?.organizer_id)
   const backTo = location.state?.backTo || '/events'
   const backLabel = location.state?.backLabel || 'Back to Events'
+  const eventDate = toSafeDate(event.datetime)
+  const isPastEvent = Boolean(event?.is_archived) || Boolean(eventDate && eventDate.getTime() < Date.now())
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -60,7 +62,7 @@ export const EventDetails = () => {
   }, [id, currentUser])
 
   const handleOpenRsvpModal = () => {
-    if (!currentUser || isOwnEvent) return
+    if (!currentUser || isOwnEvent || isPastEvent) return
     setShowRsvpModal(true)
   }
 
@@ -110,22 +112,37 @@ export const EventDetails = () => {
     }
   }
 
-  const rsvpButtonLabel = !currentUser
-    ? 'Sign in to RSVP'
-    : isOwnEvent
-      ? 'You are the organizer'
-      : isRsvped
-        ? 'Cancel RSVP'
-        : 'RSVP for Event'
-  const rsvpMessage = !currentUser
-    ? 'Sign in to mark yourself as attending.'
-    : isOwnEvent
-      ? 'You cannot RSVP to an event you created.'
-      : isRsvped
-        ? 'You are on the attendee list.'
-        : 'Tap below to RSVP for this event.'
+  const rsvpButtonLabel = isPastEvent
+    ? isRsvped
+      ? 'You RSVPed (Past Event)'
+      : 'RSVP Closed'
+    : !currentUser
+      ? 'Sign in to RSVP'
+      : isOwnEvent
+        ? 'You are the organizer'
+        : isRsvped
+          ? 'Cancel RSVP'
+          : 'RSVP for Event'
 
-  const eventDate = toSafeDate(event.datetime)
+  const rsvpMessage = isPastEvent
+    ? isRsvped
+      ? 'You RSVP\'d to this event in the past. RSVP is now closed because the event has passed.'
+      : 'You cannot RSVP because this event has passed.'
+    : !currentUser
+      ? 'Sign in to mark yourself as attending.'
+      : isOwnEvent
+        ? 'You cannot RSVP to an event you created.'
+        : isRsvped
+          ? 'You are on the attendee list.'
+          : 'Tap below to RSVP for this event.'
+
+  const rsvpHeading = isPastEvent
+    ? isRsvped
+      ? 'You RSVPed'
+      : 'RSVP Closed'
+    : isRsvped
+      ? "You're Going!"
+      : 'Interested in this event?'
 
   if (loading) {
     return (
@@ -233,7 +250,7 @@ export const EventDetails = () => {
               <div className='rsvp-text'>
                 <span aria-hidden='true' className={!isRsvped ? 'rsvp-icon--inactive' : ''}>{isRsvped ? '✓' : '✕'}</span>
                 <span className='sr-only'>{isRsvped ? 'Status: attending' : 'Status: not attending'}</span>
-                <h4>{isRsvped ? "You're Going!" : 'Interested in this event?'}</h4>
+                <h4>{rsvpHeading}</h4>
                 <p>{rsvpMessage}</p>
               </div>
               <button
@@ -241,7 +258,7 @@ export const EventDetails = () => {
                 type='button'
                 className={`rsvp-button ${isRsvped ? 'is-active' : ''}`}
                 onClick={handleOpenRsvpModal}
-                disabled={!currentUser || isOwnEvent}
+                disabled={!currentUser || isOwnEvent || isPastEvent}
                 aria-pressed={isRsvped}
               >
                 {rsvpButtonLabel}

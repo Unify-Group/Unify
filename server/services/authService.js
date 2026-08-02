@@ -426,6 +426,13 @@ export const getDashboardData = async (userId) => {
       [resolvedUser.id]
     )
 
+    await pool.query(
+      `
+      DELETE FROM event_deletion_notices
+      WHERE created_at < NOW() - INTERVAL '5 days'
+      `,
+    )
+
     const deletionNoticesResult = await pool.query(
       `
       SELECT id, event_id, event_title, message, created_at

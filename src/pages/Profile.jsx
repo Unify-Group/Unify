@@ -62,6 +62,8 @@ export const Profile = () => {
   const [deleting, setDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteEventsPermanently, setDeleteEventsPermanently] = useState(false)
+  const [showAllAttending, setShowAllAttending] = useState(false)
+  const [showAllPastAttending, setShowAllPastAttending] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     first_name: '',
@@ -120,6 +122,8 @@ export const Profile = () => {
     .map((value) => value.trim())
     .filter(Boolean)
   const isOrganizer = hostedEvents.length > 0
+  const visibleAttendingEvents = showAllAttending ? attendingEvents : attendingEvents.slice(0, 4)
+  const visiblePastAttendingEvents = showAllPastAttending ? pastAttendingEvents : pastAttendingEvents.slice(0, 4)
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
@@ -515,19 +519,33 @@ export const Profile = () => {
             <section className='profile-panel'>
               <div className='profile-section-head'>
                 <h2>Events I&apos;m Attending</h2>
-                <Link to='/events'>View all</Link>
+                {attendingEvents.length > 4 ? (
+                  <button
+                    type='button'
+                    className='profile-inline-action'
+                    onClick={() => setShowAllAttending((current) => !current)}
+                  >
+                    {showAllAttending ? 'Show less' : 'View all'}
+                  </button>
+                ) : (
+                  <Link to='/events'>View all</Link>
+                )}
               </div>
 
               <div className='profile-attending-grid'>
-                {attendingEvents.map((event, index) => (
-                  <article key={event.id} className='profile-attending-card'>
+                {visibleAttendingEvents.map((event, index) => (
+                  <Link
+                    key={event.id}
+                    to={`/events/${event.id}`}
+                    className='profile-attending-card'
+                  >
                     <div className={`event-image ${index % 2 === 0 ? 'orange' : 'indigo'}`}>
                       {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
                     </div>
                     <h3>
                       {event.title} <span> - {formatShortDate(event.datetime)}</span>
                     </h3>
-                  </article>
+                  </Link>
                 ))}
 
                 {!attendingEvents.length && <p className='profile-empty'>You are not attending any events yet.</p>}
@@ -535,18 +553,33 @@ export const Profile = () => {
             </section>
 
             <section className='profile-panel'>
-              <h2>Past Attended Events</h2>
+              <div className='profile-section-head'>
+                <h2>Past Attended Events</h2>
+                {pastAttendingEvents.length > 4 && (
+                  <button
+                    type='button'
+                    className='profile-inline-action'
+                    onClick={() => setShowAllPastAttending((current) => !current)}
+                  >
+                    {showAllPastAttending ? 'Show less' : 'View all'}
+                  </button>
+                )}
+              </div>
 
               <div className='profile-attending-grid'>
-                {pastAttendingEvents.map((event, index) => (
-                  <article key={event.id} className='profile-attending-card'>
+                {visiblePastAttendingEvents.map((event, index) => (
+                  <Link
+                    key={event.id}
+                    to={`/events/${event.id}`}
+                    className='profile-attending-card'
+                  >
                     <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
                       {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
                     </div>
                     <h3>
                       {event.title} <span> - {formatShortDate(event.datetime)}</span>
                     </h3>
-                  </article>
+                  </Link>
                 ))}
 
                 {!pastAttendingEvents.length && <p className='profile-empty'>No past attended events yet.</p>}

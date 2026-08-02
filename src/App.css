@@ -1901,6 +1901,15 @@
   font-weight: 500;
 }
 
+.profile-inline-action {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
 .profile-event-table {
   margin-top: 1rem;
 }
@@ -1965,6 +1974,32 @@
   margin: 0.65rem 0 0;
   color: var(--ink);
   font-size: 1rem;
+}
+
+.profile-attending-card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.7rem;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.profile-attending-card:hover,
+.profile-attending-card:focus-visible {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  transform: translateY(-2px);
+}
+
+.profile-attending-card:hover h3,
+.profile-attending-card:focus-visible h3 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .profile-attending-card h3 span {
