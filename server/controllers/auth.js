@@ -1,4 +1,5 @@
 import {
+  deleteCurrentUserAccount,
   getCurrentUser,
   getDashboardData,
   loginUser,
@@ -49,5 +50,14 @@ export const updateMe = async (req, res) => {
     return res.status(200).json(result)
   } catch (err) {
     return handleError(res, err, 'Failed to update profile')
+  }
+}
+
+export const deleteMe = async (req, res) => {
+  try {
+    const result = await deleteCurrentUserAccount(req.user)
+    return res.status(200).json(result)
+  } catch (err) {
+    return handleError(res, err, 'Failed to delete account')
   }
 }

@@ -1,6 +1,7 @@
 import { pool } from '../config/db.js'
 import { hashPassword, comparePassword } from '../utils/password.js'
 import { generateToken } from '../utils/jwt.js'
+import { archivePastEvents } from './archiveService.js'
 
 const cleanUser = (row) => ({
   id: row.id,
@@ -281,6 +282,8 @@ export const getCurrentUser = async (authUser) => {
 
 export const getDashboardData = async (userId) => {
   try {
+    await archivePastEvents()
+
     const resolvedUser = await resolveAuthenticatedUser(userId)
     const userResult = await pool.query(
       `
@@ -310,7 +313,7 @@ export const getDashboardData = async (userId) => {
 
     const user = mapCurrentUser(userResult.rows[0])
 
-    const attendingResult = await pool.query(
+    const attendingUpcomingResult = await pool.query(
       `
       SELECT
         e.id,
@@ -329,13 +332,42 @@ export const getDashboardData = async (userId) => {
       FROM rsvps r
       INNER JOIN events e ON e.id = r.event_id
       LEFT JOIN categories c ON c.id = e.category_id
-      WHERE r.user_id = $1 AND r.status = 'attending'
+      WHERE r.user_id = $1
+        AND r.status = 'attending'
+        AND e.archived_at IS NULL
+        AND e.datetime >= NOW()
       ORDER BY e.datetime ASC
       `,
       [resolvedUser.id]
     )
 
-    const hostedResult = await pool.query(
+    const attendingPastResult = await pool.query(
+      `
+      SELECT
+        ea.source_event_id AS id,
+        ea.title,
+        ea.datetime,
+        ea.location,
+        ea.description,
+        ea.image_url,
+        ea.attendee_limit,
+        ea.organizer_id,
+        ea.category_id,
+        ea.created_at,
+        c.name AS category_name,
+        r.status,
+        r.created_at AS rsvp_created_at
+      FROM rsvps r
+      INNER JOIN events_archive ea ON ea.source_event_id = r.event_id
+      LEFT JOIN categories c ON c.id = ea.category_id
+      WHERE r.user_id = $1
+        AND r.status = 'attending'
+      ORDER BY ea.datetime DESC
+      `,
+      [resolvedUser.id]
+    )
+
+    const hostedUpcomingResult = await pool.query(
       `
       SELECT
         e.id,
@@ -352,7 +384,31 @@ export const getDashboardData = async (userId) => {
       FROM events e
       LEFT JOIN categories c ON c.id = e.category_id
       WHERE e.organizer_id = $1
+        AND e.archived_at IS NULL
+        AND e.datetime >= NOW()
       ORDER BY e.datetime ASC
+      `,
+      [resolvedUser.id]
+    )
+
+    const hostedPastResult = await pool.query(
+      `
+      SELECT
+        ea.source_event_id AS id,
+        ea.title,
+        ea.datetime,
+        ea.location,
+        ea.description,
+        ea.image_url,
+        ea.attendee_limit,
+        ea.organizer_id,
+        ea.category_id,
+        ea.created_at,
+        c.name AS category_name
+      FROM events_archive ea
+      LEFT JOIN categories c ON c.id = ea.category_id
+      WHERE ea.organizer_id = $1
+      ORDER BY ea.datetime DESC
       `,
       [resolvedUser.id]
     )
@@ -386,15 +442,20 @@ export const getDashboardData = async (userId) => {
         c.name AS category_name
       FROM events e
       LEFT JOIN categories c ON c.id = e.category_id
+      WHERE e.archived_at IS NULL AND e.datetime >= NOW()
       ORDER BY e.datetime ASC
       `
     )
 
-    const attendingEvents = attendingResult.rows
-    const hostedEvents = hostedResult.rows
+    const attendingEvents = attendingUpcomingResult.rows
+    const pastAttendingEvents = attendingPastResult.rows
+    const hostedEvents = hostedUpcomingResult.rows
+    const pastHostedEvents = hostedPastResult.rows
     const excludedEventIds = new Set([
       ...attendingEvents.map((event) => event.id),
+      ...pastAttendingEvents.map((event) => event.id),
       ...hostedEvents.map((event) => event.id),
+      ...pastHostedEvents.map((event) => event.id),
     ])
     const interestTerms = parseInterestTerms(user.profile?.interests)
 
@@ -421,11 +482,15 @@ export const getDashboardData = async (userId) => {
       stats: {
         attendingCount: attendingEvents.length,
         hostingCount: hostedEvents.length,
+        pastAttendingCount: pastAttendingEvents.length,
+        pastHostingCount: pastHostedEvents.length,
         connectionsCount: connectionCount,
       },
       upNextEvent,
       attendingEvents,
+      pastAttendingEvents,
       hostedEvents,
+      pastHostedEvents,
       recommendedEvents,
     }
   } catch (err) {
@@ -434,6 +499,36 @@ export const getDashboardData = async (userId) => {
     }
 
     throwHttpError(500, 'Failed to load dashboard', 'DASHBOARD_FAILED')
+  }
+}
+
+export const deleteCurrentUserAccount = async (authUser) => {
+  const client = await pool.connect()
+
+  try {
+    await client.query('BEGIN')
+    const resolvedUser = await resolveAuthenticatedUser(authUser, client)
+
+    const result = await client.query('DELETE FROM users WHERE id = $1 RETURNING id', [resolvedUser.id])
+
+    if (result.rowCount === 0) {
+      await client.query('ROLLBACK')
+      throwHttpError(404, 'User not found')
+    }
+
+    await client.query('COMMIT')
+
+    return { success: true }
+  } catch (err) {
+    await client.query('ROLLBACK')
+
+    if (err.status) {
+      throw err
+    }
+
+    throwHttpError(500, 'Failed to delete account', 'ACCOUNT_DELETE_FAILED')
+  } finally {
+    client.release()
   }
 }
 

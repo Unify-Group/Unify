@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getPublicUserProfile } from '../utils/apiHelpers'
 
 const formatDate = (dateValue) => {
@@ -32,6 +32,7 @@ const yearsLabel = (years) => {
 
 export const PublicProfile = () => {
   const { id } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -60,6 +61,8 @@ export const PublicProfile = () => {
     yearsOrganizing: 0,
   }
   const hostedEvents = profile?.hostedEvents || []
+  const backTo = location.state?.backTo
+  const backLabel = location.state?.backLabel || 'Back'
 
   const interests = useMemo(
     () =>
@@ -94,9 +97,15 @@ export const PublicProfile = () => {
   return (
     <section className='public-profile-page'>
       <div className='public-profile-shell'>
-        <button type='button' className='public-profile-back' onClick={() => navigate(-1)}>
-          Back
-        </button>
+        {backTo ? (
+          <Link to={backTo} className='public-profile-back'>
+            {backLabel}
+          </Link>
+        ) : (
+          <button type='button' className='public-profile-back' onClick={() => navigate(-1)}>
+            Back
+          </button>
+        )}
 
         <section className='public-profile-hero'>
           <div className='public-profile-banner'></div>
@@ -161,6 +170,7 @@ export const PublicProfile = () => {
               <Link
                 key={event.id}
                 to={`/events/${event.id}`}
+                replace
                 state={{ backTo: `/users/${user.id}`, backLabel: `Back to ${displayName}` }}
                 className='public-profile-event-card'
               >

@@ -27,6 +27,23 @@ app.get('/', (req, res) => {
 const ensureSchema = async () => {
   try {
     await pool.query('ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS image_url TEXT')
+    await pool.query('ALTER TABLE IF EXISTS events ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ')
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS events_archive (
+        id SERIAL PRIMARY KEY,
+        source_event_id INT NOT NULL UNIQUE,
+        title VARCHAR(80) NOT NULL,
+        datetime TIMESTAMPTZ NOT NULL,
+        location VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        image_url TEXT,
+        attendee_limit INT,
+        organizer_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        category_id INT REFERENCES categories(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL,
+        archived_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `)
   } catch (error) {
     console.error('Failed to ensure optional schema columns:', error)
   }

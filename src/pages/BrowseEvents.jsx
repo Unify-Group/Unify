@@ -349,7 +349,12 @@ export const BrowseEvents = () => {
             {filteredEvents.length === 0 && <p className='browse-note'>No events found.</p>}
 
             {visibleEvents.map((event) => (
-              <article key={event.id} className='browse-card'>
+              <Link
+                key={event.id}
+                to={`/events/${event.id}`}
+                className='browse-card browse-card-clickable'
+                aria-label={`View details for ${event.title}`}
+              >
                 <div className='browse-card-image'>
                   {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
                 </div>
@@ -363,10 +368,8 @@ export const BrowseEvents = () => {
                     <span className='browse-going'>👥 {Number(event.attending_count || 0)} Going</span>
                   </div>
                 </div>
-                <Link to={`/events/${event.id}`} className='browse-card-link'>
-                  View Details
-                </Link>
-              </article>
+                <span className='browse-card-link'>View Details</span>
+              </Link>
             ))}
 
             {hasMoreEvents && (

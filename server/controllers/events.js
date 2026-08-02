@@ -1,9 +1,11 @@
 import { pool } from '../config/db.js'
 import { handleError } from '../utils/handleError.js'
+import { archivePastEvents } from '../services/archiveService.js'
 
 const eventSelect = `
   SELECT
     e.*, c.name AS category_name,
+    FALSE AS is_archived,
     COALESCE(attending.attending_count, 0)::INT AS attending_count
   FROM events e
   LEFT JOIN categories c ON c.id = e.category_id
@@ -41,9 +43,12 @@ const createEvent = async (req, res) => {
   }
 
   try {
+    const eventDate = new Date(datetime)
+    const archivedAt = Number.isNaN(eventDate.getTime()) || eventDate >= new Date() ? null : new Date().toISOString()
+
     const insertQuery = `
-      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id, organizer_id, image_url)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO events (title, description, datetime, location, attendee_limit, category_id, organizer_id, image_url, archived_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `
     const result = await pool.query(insertQuery, [
@@ -55,6 +60,7 @@ const createEvent = async (req, res) => {
       category_id,
       organizer_id,
       image_url || null,
+      archivedAt,
     ])
     res.status(201).json(result.rows[0])
     console.log('🆕 event created successfully:', result.rows[0])
@@ -66,7 +72,11 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
   try {
-    const result = await pool.query(`${eventSelect} ORDER BY e.datetime ASC`)
+    await archivePastEvents()
+
+    const result = await pool.query(
+      `${eventSelect} WHERE e.archived_at IS NULL AND e.datetime >= NOW() ORDER BY e.datetime ASC`,
+    )
     res.status(200).json(result.rows)
   } catch (err) {
     console.error('🚫 error to GET events:', err)
@@ -77,15 +87,52 @@ const getAllEvents = async (req, res) => {
 const getEventById = async (req, res) => {
   const id = parseInt(req.params.id)
   try {
-    const result = await pool.query(`${eventSelect} WHERE e.id = $1`, [id])
-    if (result.rows.length === 0) {
+    const activeResult = await pool.query(`${eventSelect} WHERE e.id = $1`, [id])
+
+    if (activeResult.rows.length > 0) {
+      return res.status(200).json(activeResult.rows[0])
+    }
+
+    await archivePastEvents()
+
+    const archivedResult = await pool.query(
+      `
+      SELECT
+        ea.source_event_id AS id,
+        ea.title,
+        ea.datetime,
+        ea.location,
+        ea.description,
+        ea.image_url,
+        ea.attendee_limit,
+        ea.organizer_id,
+        ea.category_id,
+        ea.created_at,
+        ea.archived_at,
+        c.name AS category_name,
+        TRUE AS is_archived,
+        COALESCE(attending.attending_count, 0)::INT AS attending_count
+      FROM events_archive ea
+      LEFT JOIN categories c ON c.id = ea.category_id
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*)::INT AS attending_count
+        FROM rsvps r
+        WHERE r.event_id = ea.source_event_id AND r.status = 'attending'
+      ) attending ON TRUE
+      WHERE ea.source_event_id = $1
+      `,
+      [id],
+    )
+
+    if (archivedResult.rows.length === 0) {
       return handleError(
         res,
         { status: 404, code: 'NOT_FOUND', message: 'Event not found' },
         'Event not found',
       )
     }
-    res.status(200).json(result.rows[0])
+
+    res.status(200).json(archivedResult.rows[0])
   } catch (err) {
     console.error('🚫 error to GET event by ID:', err)
     return handleError(res, err, 'Failed to load event')
@@ -102,6 +149,9 @@ const updateEvent = async (req, res) => {
   }
 
   try {
+    const eventDate = new Date(datetime)
+    const archivedAt = Number.isNaN(eventDate.getTime()) || eventDate >= new Date() ? null : new Date().toISOString()
+
     const access = await requireOrganizer(id, organizerId)
 
     if (access.error) {
@@ -118,11 +168,12 @@ const updateEvent = async (req, res) => {
         location = $4,
         attendee_limit = $5,
         category_id = $6,
-        image_url = $7
-      WHERE id = $8
+        image_url = $7,
+        archived_at = $8
+      WHERE id = $9
       RETURNING *
       `,
-      [title, description, datetime, location, attendee_limit, category_id, image_url || null, id],
+      [title, description, datetime, location, attendee_limit, category_id, image_url || null, archivedAt, id],
     )
 
     res.status(200).json(result.rows[0])

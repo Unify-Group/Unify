@@ -159,6 +159,85 @@
   gap: 1rem;
 }
 
+.nav-profile-menu-wrapper {
+  position: relative;
+}
+
+.nav-avatar-link,
+.nav-avatar-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #eef2ff;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.nav-avatar-button {
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-avatar-link img,
+.nav-avatar-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-avatar-link:hover,
+.nav-avatar-button:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.nav-profile-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.12);
+  padding: 0.35rem;
+  display: grid;
+  gap: 0.2rem;
+  z-index: 300;
+}
+
+.nav-profile-menu-item {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+}
+
+.nav-profile-menu-item:hover {
+  background: var(--bg-subtle);
+}
+
+.nav-profile-menu-item.is-danger {
+  color: #b91c1c;
+}
+
 .nav-logout {
   border: 0;
   background: transparent;
@@ -512,6 +591,23 @@
   border-radius: 10px;
   background: #ffffff;
   padding: 0.8rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.browse-card-clickable {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.browse-card:hover,
+.browse-card:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  transform: translateY(-2px);
 }
 
 .browse-card-image {
@@ -766,6 +862,11 @@
   padding: 0.75rem 1rem;
   color: var(--ink);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.event-attendee-row:hover {
+  border-color: var(--primary);
 }
 
 .event-details-section.rsvp {
@@ -1022,7 +1123,7 @@
 .dashboard-stats {
   margin-top: 1.3rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 1rem;
 }
 
@@ -1073,6 +1174,16 @@
 .dashboard-stat-badge.green {
   color: #15803d;
   background: #e9f9ee;
+}
+
+.dashboard-stat-badge.slate {
+  color: #4338ca;
+  background: #eef2ff;
+}
+
+.dashboard-stat-badge.amber {
+  color: #dd6b20;
+  background: #fff1e6;
 }
 
 .dashboard-section {
@@ -1170,12 +1281,30 @@
   border-radius: 12px;
   background: #ffffff;
   padding: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
 }
 
 .dashboard-event-card h3 {
   margin: 0.85rem 0 0.35rem;
   color: var(--ink);
   font-size: 1rem;
+}
+
+.dashboard-event-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  transform: translateY(-2px);
+}
+
+.dashboard-event-card:hover h3,
+.dashboard-event-card:focus-visible h3 {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .dashboard-event-card p {
@@ -1723,6 +1852,24 @@
   color: #ffffff;
   text-decoration: none;
   font-weight: 700;
+}
+
+.profile-danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  margin-top: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #dc2626;
+  background: #ffffff;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.profile-danger-btn:hover:not(:disabled) {
+  background: #fef2f2;
 }
 
 .profile-section-head {
@@ -2569,6 +2716,10 @@ button,
     margin-top: 0.5rem;
     width: 100%;
     min-height: 46px;
+  }
+
+  .nav-mobile-menu .nav-avatar-link {
+    margin-top: 0.25rem;
   }
 
   .nav-mobile-menu .nav-logout {

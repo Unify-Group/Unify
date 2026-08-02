@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
+import { clearSession, deleteCurrentUserAccount, fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
 import { parseInterestList } from '../utils/profileUtils'
 
 const IDENTITY_OPTIONS = [
@@ -59,6 +59,8 @@ export const Profile = () => {
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
     first_name: '',
@@ -107,7 +109,9 @@ export const Profile = () => {
 
   const user = dashboard?.user
   const hostedEvents = dashboard?.hostedEvents || []
+  const pastHostedEvents = dashboard?.pastHostedEvents || []
   const attendingEvents = dashboard?.attendingEvents || []
+  const pastAttendingEvents = dashboard?.pastAttendingEvents || []
   const interests = parseInterestList(user?.profile?.interests)
   const identityLabels = String(user?.profile?.identity_labels || '')
     .split(',')
@@ -223,6 +227,21 @@ export const Profile = () => {
       setError(err.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDeleteProfile = async () => {
+    setDeleting(true)
+    setError('')
+
+    try {
+      await deleteCurrentUserAccount()
+      clearSession()
+      window.location.href = '/'
+    } catch (err) {
+      setError(err.message)
+      setDeleting(false)
+      setShowDeleteConfirm(false)
     }
   }
 
@@ -419,6 +438,15 @@ export const Profile = () => {
               <Link to='/events/create' className='profile-create-btn'>
                 Create New Event
               </Link>
+
+              <button
+                type='button'
+                className='profile-danger-btn'
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={deleting}
+              >
+                Delete Profile
+              </button>
             </div>
           </aside>
 
@@ -452,6 +480,34 @@ export const Profile = () => {
             </section>
 
             <section className='profile-panel'>
+              <h2>My Past Hosted Events</h2>
+
+              <div className='profile-event-table'>
+                <div className='profile-event-table-head'>
+                  <span>Event</span>
+                  <span>Date</span>
+                  <span>Cap.</span>
+                  <span>Details</span>
+                </div>
+
+                {pastHostedEvents.map((event) => (
+                  <div key={event.id} className='profile-event-row'>
+                    <strong>{event.title}</strong>
+                    <span>{formatDate(event.datetime)}</span>
+                    <span>{event.attendee_limit || 'Open'}</span>
+                    <div className='profile-event-actions'>
+                      <Link to={`/events/${event.id}`} className='profile-outline-btn'>
+                        View
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+
+                {!pastHostedEvents.length && <p className='profile-empty'>No past hosted events yet.</p>}
+              </div>
+            </section>
+
+            <section className='profile-panel'>
               <div className='profile-section-head'>
                 <h2>Events I&apos;m Attending</h2>
                 <Link to='/events'>View all</Link>
@@ -472,9 +528,52 @@ export const Profile = () => {
                 {!attendingEvents.length && <p className='profile-empty'>You are not attending any events yet.</p>}
               </div>
             </section>
+
+            <section className='profile-panel'>
+              <h2>Past Attended Events</h2>
+
+              <div className='profile-attending-grid'>
+                {pastAttendingEvents.map((event, index) => (
+                  <article key={event.id} className='profile-attending-card'>
+                    <div className={`event-image ${index % 2 === 0 ? 'indigo' : 'orange'}`}>
+                      {event.image_url ? <img src={event.image_url} alt={event.title} /> : null}
+                    </div>
+                    <h3>
+                      {event.title} <span> - {formatShortDate(event.datetime)}</span>
+                    </h3>
+                  </article>
+                ))}
+
+                {!pastAttendingEvents.length && <p className='profile-empty'>No past attended events yet.</p>}
+              </div>
+            </section>
           </div>
         </section>
       </div>
+
+      {showDeleteConfirm && (
+        <div className='rsvp-modal-backdrop' role='dialog' aria-modal='true' onClick={() => setShowDeleteConfirm(false)}>
+          <div className='rsvp-modal-card' onClick={(event) => event.stopPropagation()}>
+            <div className='rsvp-modal-header'>
+              <h3>Delete Profile</h3>
+              <button className='rsvp-modal-close' onClick={() => setShowDeleteConfirm(false)} aria-label='Close'>✕</button>
+            </div>
+
+            <p className='rsvp-modal-text'>
+              Are you sure u want to delete your profile? if you delete your profile it will never be recovered again.
+            </p>
+
+            <div className='rsvp-modal-actions'>
+              <button type='button' className='rsvp-modal-secondary' onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
+                No
+              </button>
+              <button type='button' className='rsvp-modal-primary' onClick={handleDeleteProfile} disabled={deleting}>
+                {deleting ? 'Deleting...' : 'Yes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

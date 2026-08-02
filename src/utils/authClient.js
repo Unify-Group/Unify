@@ -142,6 +142,26 @@ export const updateCurrentUserProfile = async (profileData) => {
   return payload.user
 }
 
+export const deleteCurrentUserAccount = async () => {
+  const token = getSavedToken()
+
+  if (!token) {
+    throw new Error('Authentication required')
+  }
+
+  try {
+    return await toJsonOrThrow(
+      apiClient.delete('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    )
+  } catch (error) {
+    handleStaleSession(error)
+  }
+}
+
 export const saveSession = ({ token, user }) => {
   localStorage.setItem(TOKEN_KEY, token)
   localStorage.setItem(USER_KEY, JSON.stringify(user))

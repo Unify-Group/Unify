@@ -149,7 +149,7 @@ export const EventDetails = () => {
     <>
       <article className='event-details-page'>
         <div className='event-details-shell'>
-          <Link to={backTo} className='event-back-link'>
+          <Link to={backTo} replace className='event-back-link'>
             ⬅ {backLabel}
           </Link>
 
@@ -205,13 +205,24 @@ export const EventDetails = () => {
                     {event.organizer && (
                       <span className='host-name'>
                         <h4>
-                          <Link to={`/users/${event.organizer_id}`}>{`${event.organizer?.first_name} ${event.organizer?.last_name}`}</Link>
+                          <Link
+                            to={`/users/${event.organizer_id}`}
+                            state={{ backTo: `/events/${id}`, backLabel: 'Back to Event' }}
+                          >
+                            {`${event.organizer?.first_name} ${event.organizer?.last_name}`}
+                          </Link>
                         </h4>
                         <p>Organizer</p>
                       </span>
                     )}
                   </div>
-                  <Link className='host-profile-link' to={`/users/${event.organizer_id}`}>View Profile</Link>
+                  <Link
+                    className='host-profile-link'
+                    to={`/users/${event.organizer_id}`}
+                    state={{ backTo: `/events/${id}`, backLabel: 'Back to Event' }}
+                  >
+                    View Profile
+                  </Link>
                 </div>
               </span>
 
@@ -239,19 +250,33 @@ export const EventDetails = () => {
               <span className='event-details-attendees'>
                 <div className='attendees-heading'>
                   <h3>Attendees ({attendees.length})</h3>
-                  <Link to={`/events/${id}/attendees`}>View All</Link>
+                  <Link to={`/events/${id}/attendees`} state={{ backTo: `/events/${id}`, backLabel: 'Back to Event' }}>
+                    View All
+                  </Link>
                 </div>
                 <div className='attendees-avatars'>
                   {attendees.map((attendee) =>
                     attendee.avatar_url ? (
-                      <img
+                      <Link
                         key={attendee.id}
-                        className='attendee-avatar'
-                        src={attendee.avatar_url}
-                        alt={`${attendee.first_name} ${attendee.last_name}`}
-                      />
+                        to={`/users/${attendee.id}`}
+                        state={{ backTo: `/events/${id}`, backLabel: 'Back to Event' }}
+                        aria-label={`View ${attendee.first_name} ${attendee.last_name}'s profile`}
+                      >
+                        <img
+                          className='attendee-avatar'
+                          src={attendee.avatar_url}
+                          alt={`${attendee.first_name} ${attendee.last_name}`}
+                        />
+                      </Link>
                     ) : (
-                      <div key={attendee.id} className='attendee-avatar' aria-label={`${attendee.first_name} ${attendee.last_name}`} role='img' />
+                      <Link
+                        key={attendee.id}
+                        to={`/users/${attendee.id}`}
+                        state={{ backTo: `/events/${id}`, backLabel: 'Back to Event' }}
+                        className='attendee-avatar'
+                        aria-label={`View ${attendee.first_name} ${attendee.last_name}'s profile`}
+                      />
                     ),
                   )}
                 </div>

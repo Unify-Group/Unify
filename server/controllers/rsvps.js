@@ -6,9 +6,22 @@ const createRsvp = async (req, res) => {
   const userId = req.user?.id
 
   try {
-    const eventResult = await pool.query('SELECT organizer_id FROM events WHERE id = $1', [eventId])
+    const eventResult = await pool.query('SELECT organizer_id, archived_at, datetime FROM events WHERE id = $1', [eventId])
 
     if (eventResult.rows.length === 0) {
+      const archivedResult = await pool.query(
+        'SELECT source_event_id FROM events_archive WHERE source_event_id = $1',
+        [eventId],
+      )
+
+      if (archivedResult.rows.length > 0) {
+        return handleError(
+          res,
+          { status: 400, code: 'EVENT_ARCHIVED', message: 'This event has already ended' },
+          'This event has already ended',
+        )
+      }
+
       return handleError(
         res,
         { status: 404, code: 'NOT_FOUND', message: 'Event not found' },
@@ -16,7 +29,17 @@ const createRsvp = async (req, res) => {
       )
     }
 
-    if (Number(eventResult.rows[0].organizer_id) === Number(userId)) {
+    const eventRow = eventResult.rows[0]
+
+    if (eventRow.archived_at || new Date(eventRow.datetime) < new Date()) {
+      return handleError(
+        res,
+        { status: 400, code: 'EVENT_ARCHIVED', message: 'This event has already ended' },
+        'This event has already ended',
+      )
+    }
+
+    if (Number(eventRow.organizer_id) === Number(userId)) {
       return handleError(
         res,
         { status: 403, code: 'RSVP_FORBIDDEN', message: 'You cannot RSVP to an event you created' },

@@ -23,12 +23,6 @@ const formatDate = (dateValue) => {
   }
 }
 
-const initialsFromUser = (user) => {
-  const first = String(user?.first_name || user?.firstName || '').trim()
-  const last = String(user?.last_name || user?.lastName || '').trim()
-  return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() || 'U'
-}
-
 const DASHBOARD_MESSAGES = [
   "Here's what's happening in your community.",
   'Your next great connection starts here.',
@@ -42,7 +36,6 @@ export const HomeDashboard = () => {
   const savedUser = getSavedUser()
   const user = dashboard?.user || savedUser
   const firstName = user?.first_name || user?.firstName || 'there'
-  const avatarUrl = String(user?.profile?.avatar_url || user?.avatar_url || '').trim()
   const messageSeed = Number(user?.id) || firstName.length || 0
   const messageIndex = (new Date().getDate() + messageSeed) % DASHBOARD_MESSAGES.length
   const heroMessage = DASHBOARD_MESSAGES[messageIndex]
@@ -66,6 +59,8 @@ export const HomeDashboard = () => {
   const dashboardStats = dashboard?.stats || {
     attendingCount: 0,
     hostingCount: 0,
+    pastAttendingCount: 0,
+    pastHostingCount: 0,
     connectionsCount: 0,
   }
   const upNextEvent = dashboard?.upNextEvent || null
@@ -75,6 +70,8 @@ export const HomeDashboard = () => {
   const statCards = [
     { label: 'Events Attending', value: dashboardStats.attendingCount, tone: 'indigo' },
     { label: 'Events Hosting', value: dashboardStats.hostingCount, tone: 'orange' },
+    { label: 'Past Attending', value: dashboardStats.pastAttendingCount, tone: 'slate' },
+    { label: 'Past Hosting', value: dashboardStats.pastHostingCount, tone: 'amber' },
     { label: 'Connections', value: dashboardStats.connectionsCount, tone: 'green' },
   ]
 
@@ -92,17 +89,6 @@ export const HomeDashboard = () => {
           <div>
             <h1>Welcome back, {firstName} <span aria-hidden='true'>👋</span></h1>
             <p>{heroMessage}</p>
-          </div>
-
-          <div className='dashboard-topbar-actions'>
-            <Link to='/events/create' className='create-event-btn'>Create Event</Link>
-            <div className='dashboard-avatar' aria-label='Profile avatar'>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={`${firstName} profile`} />
-              ) : (
-                initialsFromUser(user)
-              )}
-            </div>
           </div>
         </div>
 
