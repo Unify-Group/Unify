@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unify Login</title>
+    <script>
+      (function () {
+        var query = window.location.search || '';
+        var hash = window.location.hash || '';
+        window.location.replace('/' + query + hash);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to Unify...</p>
+  </body>
+</html>
