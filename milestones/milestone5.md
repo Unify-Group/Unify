@@ -80,7 +80,7 @@ Complete the checklist below detailing each baseline, custom, and stretch featur
 
 ## Final Demo GIF
 
-🔗 [Here's a GIF walkthrough of the final project](👉🏾👉🏾👉🏾 your link here)
+<img src='./Gif/Final Unify.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ## Reflection
 
