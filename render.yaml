@@ -44,6 +44,10 @@ services:
     env: static
     buildCommand: npm ci --include=dev && npm run build
     staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     autoDeploy: true
     pullRequestPreviewsEnabled: true
     envVars:
