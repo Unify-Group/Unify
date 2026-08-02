@@ -5,8 +5,13 @@ import { getSavedUser } from '../utils/authClient'
 import { resizeImageFile } from '../utils/imageUpload.js'
 
 const toDateInputValue = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+
   try {
-    const date = new Date(dateValue)
     const pad = (value) => String(value).padStart(2, '0')
 
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`

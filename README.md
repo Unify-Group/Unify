@@ -127,4 +127,76 @@ When a user want to check out another user or the person who organized this even
 
 ## Installation Instructions
 
-[instructions go here]
+### 1. Prerequisites
+
+- Node.js 18+
+- npm 9+
+- PostgreSQL (local instance or hosted DB)
+
+### 2. Clone and install dependencies
+
+```bash
+git clone <your-repo-url>
+cd Unify
+npm install
+```
+
+### 3. Create environment file
+
+Create a file at `server/.env` with the following values:
+
+```env
+# App
+PORT=3001
+
+# PostgreSQL
+PGUSER=your_db_user
+PGPASSWORD=your_db_password
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=unify
+
+# Auth
+JWT_SECRET=replace-with-a-strong-secret
+JWT_EXPIRES_IN=7d
+
+# Optional OAuth (GitHub)
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GITHUB_REDIRECT_URI=http://localhost:5173/login
+
+# Optional OAuth (Google)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:5173/login
+```
+
+Notes:
+- OAuth is optional for local development. Email/password auth works without OAuth values.
+- If your frontend needs a custom API URL, add `VITE_API_BASE_URL=http://localhost:3001` in a root `.env` file.
+
+### 4. Initialize/reset the database
+
+This project includes a reset/seed script.
+
+```bash
+npm run reset -- --force
+```
+
+### 5. Run the app
+
+From the project root:
+
+```bash
+npm run dev
+```
+
+This starts:
+- Express API on `http://localhost:3001`
+- Vite frontend on `http://localhost:5173`
+
+### 6. Build for production
+
+```bash
+npm run build
+```

@@ -4,8 +4,14 @@ import { fetchDashboardData, getSavedUser } from '../utils/authClient'
 import { buildRecentActivity, parseInterestList } from '../utils/profileUtils'
 
 const formatDate = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Date to be announced'
+  }
+
   try {
-    return new Date(dateValue).toLocaleString(undefined, {
+    return date.toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

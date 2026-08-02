@@ -19,8 +19,14 @@ const IDENTITY_OPTIONS = [
 ]
 
 const formatDate = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Date to be announced'
+  }
+
   try {
-    return new Date(dateValue).toLocaleString(undefined, {
+    return date.toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
@@ -32,8 +38,14 @@ const formatDate = (dateValue) => {
 }
 
 const formatShortDate = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'TBD'
+  }
+
   try {
-    return new Date(dateValue).toLocaleDateString(undefined, {
+    return date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     })

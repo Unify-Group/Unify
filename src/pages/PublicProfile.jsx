@@ -3,8 +3,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getPublicUserProfile } from '../utils/apiHelpers'
 
 const formatDate = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Date to be announced'
+  }
+
   try {
-    return new Date(dateValue).toLocaleString(undefined, {
+    return date.toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

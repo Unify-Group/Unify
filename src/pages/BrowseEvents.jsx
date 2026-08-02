@@ -3,8 +3,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const formatDate = (dateValue) => {
+  const date = new Date(dateValue)
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Date to be announced'
+  }
+
   try {
-    return new Date(dateValue).toLocaleString(undefined, {
+    return date.toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -24,7 +30,7 @@ export const BrowseEvents = () => {
   const [sortBy, setSortBy] = useState('date_asc')
   const [showFilters, setShowFilters] = useState(false)
   
-  // Track default values for reset functionality
+  // Keep filter defaults in one place so reset behavior stays predictable.
   const DEFAULT_FILTERS = {
     category: 'all',
     date: 'all',
@@ -78,6 +84,28 @@ export const BrowseEvents = () => {
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
+
+  useEffect(() => {
+    if (!showFilters) {
+      return
+    }
+
+    // Prevent background page scroll while the filter drawer is open.
+    document.body.style.overflow = 'hidden'
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setShowFilters(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [showFilters])
 
   const categories = useMemo(() => {
     return Array.from(
@@ -191,6 +219,7 @@ export const BrowseEvents = () => {
       return
     }
 
+    // Infinite-scroll behavior loads the next page before users hit the bottom.
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
@@ -221,7 +250,9 @@ export const BrowseEvents = () => {
           <button
             type='button'
             className='browse-filter-toggle'
-            onClick={() => setShowFilters(true)}
+            onClick={() => setShowFilters((current) => !current)}
+            aria-expanded={showFilters}
+            aria-controls='event-filter-drawer'
           >
             Filters
           </button>
@@ -236,7 +267,7 @@ export const BrowseEvents = () => {
               aria-label='Close filters'
             />
 
-            <aside className='browse-filter-drawer' aria-label='Event filters'>
+            <aside id='event-filter-drawer' className='browse-filter-drawer' aria-label='Event filters'>
               <div className='browse-filter-head'>
                 <div>
                   <h3>Filters</h3>
@@ -332,11 +363,9 @@ export const BrowseEvents = () => {
                     <span className='browse-going'>👥 {Number(event.attending_count || 0)} Going</span>
                   </div>
                 </div>
-                <button type='button' className='browse-card-link'>
-                  <Link to={`/events/${event.id}`}>
-                    View Details
-                  </Link>
-                </button>
+                <Link to={`/events/${event.id}`} className='browse-card-link'>
+                  View Details
+                </Link>
               </article>
             ))}
 

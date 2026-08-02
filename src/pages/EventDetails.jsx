@@ -3,6 +3,11 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { getEventById, getMyRsvp, getEventAttendees, createRsvp, deleteRsvp } from '../utils/apiHelpers'
 import { getSavedUser } from '../utils/authClient'
 
+const toSafeDate = (dateValue) => {
+  const date = new Date(dateValue)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
 export const EventDetails = () => {
   const { id } = useParams()
   const location = useLocation()
@@ -120,6 +125,8 @@ export const EventDetails = () => {
         ? 'You are on the attendee list.'
         : 'Tap below to RSVP for this event.'
 
+  const eventDate = toSafeDate(event.datetime)
+
   if (loading) {
     return (
       <section className='event-details-page' aria-busy='true' aria-label='Loading event'>
@@ -158,8 +165,22 @@ export const EventDetails = () => {
                 <h1>{event.title}</h1>
                 <div className='category'>{event.category_name}</div>
                 <div className='date-time-location'>
-                  <p><span aria-hidden='true'>📅</span> <time dateTime={event.datetime}>{new Date(event.datetime).toLocaleDateString()}</time></p>
-                  <p><span aria-hidden='true'>🕐</span> <time dateTime={event.datetime}>{new Date(event.datetime).toLocaleTimeString()}</time></p>
+                  <p>
+                    <span aria-hidden='true'>📅</span>{' '}
+                    {eventDate ? (
+                      <time dateTime={eventDate.toISOString()}>{eventDate.toLocaleDateString()}</time>
+                    ) : (
+                      <span>Date to be announced</span>
+                    )}
+                  </p>
+                  <p>
+                    <span aria-hidden='true'>🕐</span>{' '}
+                    {eventDate ? (
+                      <time dateTime={eventDate.toISOString()}>{eventDate.toLocaleTimeString()}</time>
+                    ) : (
+                      <span>Time to be announced</span>
+                    )}
+                  </p>
                   <p><span aria-hidden='true'>📍</span> {event.location}</p>
                 </div>
               </span>
@@ -190,9 +211,7 @@ export const EventDetails = () => {
                       </span>
                     )}
                   </div>
-                  <button type='button'>
-                    <Link to={`/users/${event.organizer_id}`}>View Profile</Link>
-                  </button>
+                  <Link className='host-profile-link' to={`/users/${event.organizer_id}`}>View Profile</Link>
                 </div>
               </span>
 

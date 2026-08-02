@@ -564,17 +564,21 @@
   font-weight: 600;
 }
 
-.browse-card button {
+.browse-card-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--primary);
   border-radius: 8px;
   padding: 0.6rem 0.95rem;
   background: #ffffff;
   color: var(--primary);
   font-weight: 600;
+  text-decoration: none;
 }
 
-.browse-card button>a {
-  text-decoration: none;
+.browse-card-link:hover {
+  background: var(--primary-tint);
 }
 
 .browse-load-more {
@@ -685,7 +689,10 @@
   margin: 0;
 }
 
-.host-container button {
+.host-profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--primary);
   border-radius: 8px;
   padding: 0.6rem 1.5rem;
@@ -693,6 +700,11 @@
   background: #ffffff;
   color: var(--primary);
   font-weight: 600;
+  text-decoration: none;
+}
+
+.host-profile-link:hover {
+  background: var(--primary-tint);
 }
 
 .host-avatar,
