@@ -39,7 +39,7 @@ services:
       - key: GOOGLE_REDIRECT_URI
         sync: false
 
-  - type: static_site
+  - type: static
     name: unify-web
     buildCommand: npm install && npm run build
     publishPath: dist
