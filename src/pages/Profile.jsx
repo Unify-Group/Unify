@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { clearSession, deleteCurrentUserAccount, fetchDashboardData, updateCurrentUserProfile } from '../utils/authClient'
 import { formatRelativeTime, parseInterestList } from '../utils/profileUtils'
+import { useToast } from '../components/ToastProvider'
 
 const IDENTITY_OPTIONS = [
   'Community Member',
@@ -55,6 +56,7 @@ const formatShortDate = (dateValue) => {
 }
 
 export const Profile = () => {
+  const { showToast } = useToast()
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -102,13 +104,14 @@ export const Profile = () => {
       } catch (err) {
         setDashboard(null)
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadProfile()
-  }, [])
+  }, [showToast])
 
   const user = dashboard?.user
   const hostedEvents = dashboard?.hostedEvents || []
@@ -192,6 +195,7 @@ export const Profile = () => {
       })
       .catch((err) => {
         setError(err.message)
+        showToast(err.message, 'error')
       })
   }
 
@@ -229,8 +233,10 @@ export const Profile = () => {
         user: updatedUser,
       }))
       setIsEditing(false)
+      showToast('Profile updated.', 'success')
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -242,10 +248,12 @@ export const Profile = () => {
 
     try {
       await deleteCurrentUserAccount({ deleteEventsPermanently })
+      showToast('Account deleted.', 'info')
       clearSession()
       window.location.href = '/'
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
       setDeleting(false)
       setShowDeleteConfirm(false)
     }

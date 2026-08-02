@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getPublicUserProfile } from '../utils/apiHelpers'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -34,6 +36,7 @@ export const PublicProfile = () => {
   const { id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -46,13 +49,14 @@ export const PublicProfile = () => {
         setProfile(payload)
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadProfile()
-  }, [id])
+  }, [id, showToast])
 
   const user = profile?.user
   const stats = profile?.stats || {
@@ -79,7 +83,9 @@ export const PublicProfile = () => {
   if (loading) {
     return (
       <section className='public-profile-page'>
-        <div className='public-profile-shell'>Loading profile...</div>
+        <div className='public-profile-shell'>
+          <Spinner centered label='Loading profile...' />
+        </div>
       </section>
     )
   }

@@ -4,7 +4,7 @@ CodePath WEB103 Final Project
 
 Designed and developed by: David Odejimi, Fatma Elmadani, Wanyi Ng, Daniel Zhong, Diana Gómez, Hevander da Costa
 
-🔗 Link to deployed app:
+🔗 Link to deployed app: https://unify-web.onrender.com/
 
 ## About
 
@@ -26,7 +26,7 @@ Database: PostgreSQL
 
 ## Features
 
-### User registration
+### ✅ User registration
 
 To browse and join local events, users need to create an account with their email.
 
@@ -36,91 +36,91 @@ To browse and join local events, users need to create an account with their emai
 ##### With Github & Google OAuth authentication
 <img src='./planning/Gif Pics/Github Google Auth Login & SignUp.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Event creation
+### ✅ Event creation
 
 Users can create a new event with a name, description, date, location, and category so others can discover and join it.
 
 <img src='./planning/Gif Pics/Edit Event Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Event browsing
+### ✅ Event browsing
 
 Users can view a list of upcoming events to discover things happening near them.
 
 <img src='./planning/Gif Pics/Event Browsing (Not Completed).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Category filtering
+### ✅ Category filtering
 
 Users can filter events by category to quickly find ones that match their interests.
 
 <img src='./planning/Gif Pics/Category Filtering Completed.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Keyword search
+### ✅ Keyword search
 
 Users can search for events by keyword to find a specific event they already have in mind.
 
 <img src='./planning/Gif Pics/Keyword Search.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Event details view
+### ✅ Event details view
 
 Users can view an event's full details, including time, location, and description, to decide whether to attend.
 
 <img src='./planning/Gif Pics/Event details view.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### RSVP
+### ✅ RSVP
 
 Users can RSVP to an event to secure their spot and let the organizer know they're coming.
 
 <img src='./planning/Gif Pics/RSVP.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### RSVP cancellation
+### ✅ RSVP cancellation
 
 Users can cancel their RSVP to free up their spot if their plans change.
 
 <img src='./planning/Gif Pics/Cancel RSVP.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Attendee Count
+### ✅ Attendee Count
     
 Users can see how many people are attending an event to gauge its size and popularity before joining.
 
 <img src='./planning/Gif Pics/Attandee Count.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Event editing
+### ✅ Event editing
 
 Users can edit the details of an event they created to keep attendees informed with accurate information.
 
 <img src='./planning/Gif Pics/Edit Event Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Event deletion
+### ✅ Event deletion
 
 Users can delete an event they created to notify attendees if it's no longer happening.
 
 <img src='./planning/Gif Pics/Delete Event.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Attendee list
+### ✅ Attendee list
 
 Users can view the list of attendees for their event to plan accordingly for capacity or supplies.
 
 <img src='./planning/Gif Pics/Show Attendee List.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Profile dashboard
+### ✅ Profile dashboard
 
 Users can view a profile page showing the events they're organizing and the ones they've RSVP'd to, so they can track their activity in one place.
 
 <img src='./planning/Gif Pics/Profile Dashboard Edit Profile.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Landing Page
+### ✅ Landing Page
 
 Before A user login/sign up they see the landing page showing what the applications is about.
 
 <img src='./planning/Gif Pics/Landing Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Homepage Dashboard
+### ✅ Homepage Dashboard
 
 When a user login/sign up it shows a personalized homepage dashboard about their data and recommendations.
 
 <img src='./planning/Gif Pics/Home dashboard (Personalized).gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
-### Public Profile Page
+### ✅ Public Profile Page
 When a user want to check out another user or the person who organized this event to see if they have organized other events or their interest.
 
 <img src='./planning/Gif Pics/Public Profile User Page.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />

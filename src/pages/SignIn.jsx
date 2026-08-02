@@ -1,9 +1,11 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { login, saveSession, getGitHubAuthUrl, exchangeGitHubCode, getGoogleAuthUrl, exchangeGoogleCode } from '../utils/authClient'
+import { useToast } from '../components/ToastProvider'
 
 export const SignIn = () => {
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -21,7 +23,9 @@ export const SignIn = () => {
       const oauthError = searchParams.get('error')
 
       if (oauthError) {
-        setError(`Authentication failed: ${oauthError}`)
+        const message = `Authentication failed: ${oauthError}`
+        setError(message)
+        showToast(message, 'error')
         return
       }
 
@@ -40,6 +44,7 @@ export const SignIn = () => {
           setGithubLoading(true)
           const payload = await exchangeGitHubCode(code)
           saveSession(payload)
+          showToast('Signed in with GitHub.', 'success')
           // Clear URL parameters before navigating
           window.history.replaceState({}, document.title, '/')
           navigate('/home')
@@ -47,13 +52,16 @@ export const SignIn = () => {
           setGoogleLoading(true)
           const payload = await exchangeGoogleCode(code)
           saveSession(payload)
+          showToast('Signed in with Google.', 'success')
           // Clear URL parameters before navigating
           window.history.replaceState({}, document.title, '/')
           navigate('/home')
         }
       } catch (err) {
         console.error('OAuth callback error:', err)
-        setError(err.message || 'Authentication failed')
+        const message = err.message || 'Authentication failed'
+        setError(message)
+        showToast(message, 'error')
         // Clear URL parameters even on error
         window.history.replaceState({}, document.title, '/')
       } finally {
@@ -79,6 +87,7 @@ export const SignIn = () => {
       window.location.href = url
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
       setGithubLoading(false)
     }
   }
@@ -92,6 +101,7 @@ export const SignIn = () => {
       window.location.href = url
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
       setGoogleLoading(false)
     }
   }
@@ -104,9 +114,11 @@ export const SignIn = () => {
     try {
       const payload = await login({ email: form.email, password: form.password })
       saveSession(payload)
+      showToast('Welcome back.', 'success')
       navigate('/home')
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
     } finally {
       setLoading(false)
     }

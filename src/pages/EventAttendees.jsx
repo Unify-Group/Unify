@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getEventById, getEventAttendees } from '../utils/apiHelpers'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 export const EventAttendees = () => {
   const { id } = useParams()
   const location = useLocation()
+  const { showToast } = useToast()
 
   const [event, setEvent] = useState({})
   const [attendees, setAttendees] = useState([])
@@ -20,13 +23,14 @@ export const EventAttendees = () => {
         setAttendees(attendeeData)
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadAttendees()
-  }, [id])
+  }, [id, showToast])
 
   const backTo = location.state?.backTo || `/events/${id}`
   const backLabel = location.state?.backLabel || 'Back to Event'
@@ -40,7 +44,7 @@ export const EventAttendees = () => {
 
         <h1>Attendees{event.title ? ` for ${event.title}` : ''}</h1>
 
-        {loading && <p className='browse-note'>Loading attendees...</p>}
+        {loading && <Spinner centered label='Loading attendees...' />}
         {error && <p className='browse-error'>{error}</p>}
 
         {!loading && !error && (

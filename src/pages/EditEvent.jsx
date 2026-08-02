@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { deleteEvent, getCategories, getEventById, updateEvent } from '../utils/apiHelpers'
 import { getSavedUser } from '../utils/authClient'
 import { resizeImageFile } from '../utils/imageUpload.js'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 const toDateInputValue = (dateValue) => {
   const date = new Date(dateValue)
@@ -36,6 +38,7 @@ const getCurrentMinDateTime = () => {
 export const EditEvent = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showToast } = useToast()
   const user = getSavedUser()
   const [categories, setCategories] = useState([])
   const [formData, setFormData] = useState({
@@ -59,7 +62,9 @@ export const EditEvent = () => {
         const [event, categoryList] = await Promise.all([getEventById(id), getCategories()])
 
         if (Number(event.organizer_id) !== Number(user?.id)) {
-          setError('You can only edit events you created.')
+          const message = 'You can only edit events you created.'
+          setError(message)
+          showToast(message, 'error')
           return
         }
 
@@ -76,13 +81,14 @@ export const EditEvent = () => {
         })
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     load()
-  }, [id, user?.id])
+  }, [id, showToast, user?.id])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -108,6 +114,7 @@ export const EditEvent = () => {
       })
       .catch((err) => {
         setError(err.message)
+        showToast(err.message, 'error')
       })
   }
 
@@ -135,9 +142,11 @@ export const EditEvent = () => {
         image_url: formData.image_url || null,
       })
 
-      window.location.href = `/events/${id}`
+      showToast('Event updated.', 'success')
+      navigate(`/events/${id}`)
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -157,9 +166,11 @@ export const EditEvent = () => {
 
     try {
       await deleteEvent(id)
-      window.location.href = '/profile'
+      showToast('Event deleted.', 'success')
+      navigate('/profile')
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
       setSaving(false)
       setShowDeleteConfirm(false)
     }
@@ -168,7 +179,9 @@ export const EditEvent = () => {
   if (loading) {
     return (
       <section className='event-form-page'>
-        <div className='event-form-shell'>Loading event...</div>
+        <div className='event-form-shell'>
+          <Spinner centered label='Loading event...' />
+        </div>
       </section>
     )
   }

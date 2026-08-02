@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { getEventById, getMyRsvp, getEventAttendees, createRsvp, deleteRsvp } from '../utils/apiHelpers'
 import { getSavedUser } from '../utils/authClient'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 const toSafeDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -11,6 +13,7 @@ const toSafeDate = (dateValue) => {
 export const EventDetails = () => {
   const { id } = useParams()
   const location = useLocation()
+  const { showToast } = useToast()
 
   const [event, setEvent] = useState({})
   const [loading, setLoading] = useState(true)
@@ -36,13 +39,14 @@ export const EventDetails = () => {
         setEvent(eventData)
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadEvent()
-  }, [id])
+  }, [id, showToast])
 
   useEffect(() => {
     getEventAttendees(id)
@@ -80,14 +84,17 @@ export const EventDetails = () => {
     try {
       if (isRsvped) {
         await deleteRsvp(id)
+        showToast('RSVP canceled.', 'info')
       } else {
         await createRsvp(id)
+        showToast('You are now attending this event.', 'success')
       }
 
       setIsRsvped(!isRsvped)
       setAttendees(await getEventAttendees(id))
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
     }
 
     setShowRsvpModal(false)
@@ -147,7 +154,9 @@ export const EventDetails = () => {
   if (loading) {
     return (
       <section className='event-details-page' aria-busy='true' aria-label='Loading event'>
-        <div className='event-details-shell'>Loading event details...</div>
+        <div className='event-details-shell'>
+          <Spinner centered label='Loading event details...' />
+        </div>
       </section>
     )
   }

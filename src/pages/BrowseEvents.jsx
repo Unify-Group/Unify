@@ -1,6 +1,8 @@
 import { getEvents } from '../utils/apiHelpers.js'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 const formatDate = (dateValue) => {
   const date = new Date(dateValue)
@@ -23,6 +25,7 @@ const formatDate = (dateValue) => {
 }
 
 export const BrowseEvents = () => {
+  const { showToast } = useToast()
   const [events, setEvents] = useState([])
   const [query, setQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
@@ -67,13 +70,14 @@ export const BrowseEvents = () => {
         setEvents(events)
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadEvents()
-  }, [])
+  }, [showToast])
 
   useEffect(() => {
     const onResize = () => {
@@ -341,7 +345,7 @@ export const BrowseEvents = () => {
           </>
         )}
 
-        {loading && <p className='browse-note'>Loading events...</p>}
+        {loading && <Spinner centered label='Loading events...' />}
         {error && <p className='browse-error'>{error}</p>}
 
         {!loading && !error && (

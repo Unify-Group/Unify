@@ -1,6 +1,8 @@
 import { createEvent, getCategories } from '../utils/apiHelpers.js'
 import { useState, useEffect } from 'react'
 import { resizeImageFile } from '../utils/imageUpload.js'
+import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/ToastProvider'
 
 const getCurrentMinDateTime = () => {
   const now = new Date()
@@ -16,6 +18,7 @@ const getCurrentMinDateTime = () => {
 }
 
 export const CreateEvent = () => {
+  const { showToast } = useToast()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,13 +42,14 @@ export const CreateEvent = () => {
         setCategories(categories)
       } catch (err) {
         setError(err.message)
+        showToast(err.message, 'error')
       } finally {
         setLoading(false)
       }
     }
 
     loadCategories()
-  }, [])
+  }, [showToast])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -71,6 +75,7 @@ export const CreateEvent = () => {
       })
       .catch((err) => {
         setError(err.message)
+        showToast(err.message, 'error')
       })
   }
 
@@ -108,8 +113,10 @@ export const CreateEvent = () => {
         image_url: '',
         image_file_name: '',
       })
+      showToast('Event created successfully.', 'success')
     } catch (err) {
       setError(err.message)
+      showToast(err.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -118,7 +125,9 @@ export const CreateEvent = () => {
   if (loading) {
     return (
       <section className='event-form-page'>
-        <div className='event-form-shell'>Loading event form...</div>
+        <div className='event-form-shell'>
+          <Spinner centered label='Loading event form...' />
+        </div>
       </section>
     )
   }
