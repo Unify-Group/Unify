@@ -52,7 +52,7 @@ Users can view a list of upcoming events to discover things happening near them.
 
 Users can filter events by category to quickly find ones that match their interests.
 
-<img src='./planning/Gif Pics/Category Filtering Completed.gif.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
+<img src='./planning/Gif Pics/Category Filtering Completed.gif' title='Video Walkthrough' width='800' alt='Video Walkthrough' />
 
 ### ✅ Keyword search
 
